@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app'
+import '../styles/github-corner.css'
 import '../styles/globals.css'
-import '../styles/Home.css'
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return <Component {...pageProps} />

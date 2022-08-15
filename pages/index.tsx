@@ -1,8 +1,10 @@
 import * as JD from 'decoders'
 import type { NextPage } from 'next'
 import { ChangeEvent, useReducer, useState } from 'react'
-import AddIcon from './components/Add'
-import DeleteIcon from './components/Delete'
+import Layout from './components/Layout'
+import AddIcon from './components/svgs/Add'
+import DeleteIcon from './components/svgs/Delete'
+import styles from './Index.module.css'
 
 type Action =
   | { type: 'CREATE'; content: string }
@@ -172,7 +174,9 @@ const Home: NextPage = () => {
           })
         }}
       >
-        <div className={`itemContent${isDragOver ? ' dashed' : ''}`}>
+        <div
+          className={`${styles.itemContent} ${isDragOver ? styles.dashed : ''}`}
+        >
           <h2>{content}</h2>
           <button onClick={() => dispatch({ type: 'DELETE', category, id })}>
             <DeleteIcon height={13} width={13} />
@@ -199,75 +203,77 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className="container">
-      <section className="content">
-        <div>
-          <div className="todo">
-            <h1>Todo</h1>
-            <button onClick={() => setAdd(true)}>
-              <AddIcon height={15} width={15} />
-            </button>
-          </div>
-          {add && (
-            <div className="addItem">
-              <input
-                type="text"
-                onKeyUp={(e) => {
-                  if (e.code === 'Enter') {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    dispatch({ type: 'CREATE', content: addInput })
-                    setAddInput('')
-                    setAdd(false)
-                  }
-                }}
-                onChange={onAddInputChange}
-                value={addInput}
-              />
-              <div>
-                <button
-                  onClick={() => {
-                    dispatch({ type: 'CREATE', content: addInput })
-                    setAddInput('')
-                    setAdd(false)
-                  }}
-                >
-                  Add
-                </button>
-                <button onClick={() => setAdd(false)}>Cancel</button>
-              </div>
+    <Layout>
+      <div className={styles.container}>
+        <section className={styles.content}>
+          <div>
+            <div className={styles.todo}>
+              <h2>Todo</h2>
+              <button onClick={() => setAdd(true)}>
+                <AddIcon height={15} width={15} />
+              </button>
             </div>
-          )}
-          <div
-            className="items"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => onItemsDrop(e, 'todo')}
-          >
-            {Items(state.todo, 'todo')}
+            {add && (
+              <div className={styles.addItem}>
+                <input
+                  type="text"
+                  onKeyUp={(e) => {
+                    if (e.code === 'Enter') {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      dispatch({ type: 'CREATE', content: addInput })
+                      setAddInput('')
+                      setAdd(false)
+                    }
+                  }}
+                  onChange={onAddInputChange}
+                  value={addInput}
+                />
+                <div>
+                  <button
+                    onClick={() => {
+                      dispatch({ type: 'CREATE', content: addInput })
+                      setAddInput('')
+                      setAdd(false)
+                    }}
+                  >
+                    Add
+                  </button>
+                  <button onClick={() => setAdd(false)}>Cancel</button>
+                </div>
+              </div>
+            )}
+            <div
+              className={styles.items}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => onItemsDrop(e, 'todo')}
+            >
+              {Items(state.todo, 'todo')}
+            </div>
           </div>
-        </div>
-        <div>
-          <h1>Doing</h1>
-          <div
-            className="items"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => onItemsDrop(e, 'doing')}
-          >
-            {Items(state.doing, 'doing')}
+          <div>
+            <h2>Doing</h2>
+            <div
+              className={styles.items}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => onItemsDrop(e, 'doing')}
+            >
+              {Items(state.doing, 'doing')}
+            </div>
           </div>
-        </div>
-        <div>
-          <h1>Done</h1>
-          <div
-            className="items"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => onItemsDrop(e, 'done')}
-          >
-            {Items(state.done, 'done')}
+          <div>
+            <h2>Done</h2>
+            <div
+              className={styles.items}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => onItemsDrop(e, 'done')}
+            >
+              {Items(state.done, 'done')}
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </Layout>
   )
 }
 
