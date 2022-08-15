@@ -1,9 +1,9 @@
 import * as JD from 'decoders'
 import type { NextPage } from 'next'
 import { ChangeEvent, useReducer, useState } from 'react'
-import Layout from './components/Layout'
-import AddIcon from './components/svgs/Add'
-import DeleteIcon from './components/svgs/Delete'
+import Layout from '../components/Layout'
+import AddIcon from '../components/svgs/Add'
+import DeleteIcon from '../components/svgs/Delete'
 import styles from './Index.module.css'
 
 type Action =
