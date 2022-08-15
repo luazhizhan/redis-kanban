@@ -32,10 +32,6 @@
   cursor: pointer;
 }
 
-.content button:hover {
-  transform: scale(1.2);
-}
-
 .todo {
   display: flex;
   flex-direction: row;
@@ -87,8 +83,17 @@
   color: white;
   margin-right: 10px;
 }
+.addItem button:first-child:hover {
+  background: #2b93f5;
+  color: white;
+  margin-right: 10px;
+}
 .addItem button:nth-child(2) {
   background: #8c8c8c;
+  color: white;
+}
+.addItem button:nth-child(2):hover {
+  background: #717171;
   color: white;
 }
 

@@ -6,21 +6,57 @@
 }
 
 .drawer {
-  min-width: 0;
-  transition: min-width 0.5s ease;
+  transition: width 0.5s ease, min-width 0.5s ease;
 }
 .drawer.close {
+  width: 0;
   min-width: 0;
 }
 .drawer.close * {
   display: none;
 }
 .drawer.open {
+  display: flex;
+  flex-direction: column;
   min-width: 270px;
+  width: 270px;
+  padding: 10px;
   border-right: 1px solid rgb(238, 238, 238);
 }
 .drawer.open * {
   display: initial;
+}
+
+.connect {
+  border: none;
+  background: #3c9df8;
+  color: #fff;
+  border-radius: 10px;
+  height: 40px;
+  cursor: pointer;
+}
+.connect:hover {
+  background: #2b93f5;
+}
+.drawer.open .connected {
+  display: flex;
+  flex-direction: row;
+  background: none;
+  border: 1px solid rgb(173, 173, 173);
+  height: 45px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-radius: 10px;
+}
+.drawer.open .connected:hover {
+  background: rgb(226, 226, 226);
+}
+.drawer.open .connected span {
+  display: block;
+  text-align: left;
+  width: 90%;
+  margin-left: 5px;
 }
 
 .body {
