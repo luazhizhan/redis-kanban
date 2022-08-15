@@ -1,0 +1,107 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  justify-content: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  background: #f6f8f9;
+  padding: 1em;
+  gap: 20px;
+  overflow-x: auto;
+  text-align: left;
+}
+
+.content > div {
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.content h1 {
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.content button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.content button:hover {
+  transform: scale(1.2);
+}
+
+.todo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  min-height: 90%;
+  margin: 10px 0;
+  gap: 10px;
+  overflow: auto;
+}
+
+.items h2 {
+  font-size: 0.8em;
+  font-weight: normal;
+  max-width: 80%;
+}
+
+.items > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.addItem {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: white;
+  height: fit-content;
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 5px;
+}
+.addItem input {
+  outline: none;
+  font-size: 0.8em;
+}
+.addItem button {
+  font-size: 0.8em;
+  padding: 4px 8px;
+  border-radius: 5px;
+}
+.addItem button:first-child {
+  background: #3c9df8;
+  color: white;
+  margin-right: 10px;
+}
+.addItem button:nth-child(2) {
+  background: #8c8c8c;
+  color: white;
+}
+
+.itemContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  min-height: 3em;
+  height: fit-content;
+  padding: 8px;
+  border-radius: 8px;
+}
+.itemContent.dashed {
+  border: 1px dashed black;
+}
