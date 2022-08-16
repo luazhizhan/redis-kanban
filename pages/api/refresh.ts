@@ -1,15 +1,9 @@
-import * as JD from 'decoders'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as jwt from './libs/jwt'
 
-const BodyDecoder = JD.object({
-  address: JD.string,
-  token: JD.string,
-})
-
 type Error = {
   status: 'error'
-  message: 'Invalid body' | 'Invalid JWT' | 'Address mismatched' | 'Expired JWT'
+  message: jwt.Error
 }
 
 type Success = {
@@ -19,24 +13,23 @@ type Success = {
   }
 }
 
-type Return = Error | Success
+type Result = Error | Success
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Return>
+  res: NextApiResponse<Result>
 ): void {
-  const decodedBody = BodyDecoder.value(req.body)
-  if (!decodedBody) {
-    return res.status(400).json({ status: 'error', message: 'Invalid body' })
+  const token = jwt.get(req)
+  if (token === null) {
+    return res.status(400).json({ status: 'error', message: 'Unauthorised' })
   }
-  const { address, token } = decodedBody
+  const decoded = jwt.verify(token)
 
-  const message = jwt.verify(address, token)
-  if (message !== null) {
-    return res.status(400).json({ status: 'error', message })
+  if (typeof decoded === 'string') {
+    return res.status(400).json({ status: 'error', message: decoded })
   }
 
   return res
     .status(200)
-    .json({ status: 'success', body: { token: jwt.issue(address) } })
+    .json({ status: 'success', body: { token: jwt.issue(decoded.address) } })
 }

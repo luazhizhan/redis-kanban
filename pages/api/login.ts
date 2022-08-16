@@ -21,11 +21,11 @@ type Success = {
   }
 }
 
-type Return = Error | Success
+type Result = Error | Success
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Return>
+  res: NextApiResponse<Result>
 ): void {
   const decodedBody = BodyDecoder.value(req.body)
   if (!decodedBody) {

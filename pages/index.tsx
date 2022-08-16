@@ -1,45 +1,43 @@
 import * as JD from 'decoders'
 import type { NextPage } from 'next'
-import { ChangeEvent, useReducer, useState } from 'react'
+import { ChangeEvent, useEffect, useReducer, useState } from 'react'
 import ConnectButton from '../components/ConnectButton'
 import Layout from '../components/Layout'
 import AddIcon from '../components/svgs/Add'
 import DeleteIcon from '../components/svgs/Delete'
+import useApi, { ApiItem, Category } from '../hooks/useApi'
 import useWallet from '../hooks/useWallet'
 import styles from './Index.module.css'
 
 type Action =
-  | { type: 'CREATE'; content: string }
+  | { type: 'SET_ITEMS'; apiItems: ApiItem[] }
+  | { type: 'CREATE'; content: string; id: string }
   | {
       type: 'UPDATE_CATEGORY'
       newCategory: Category
       oldCategory: Category
       position: number
-      id: number
+      id: string
     }
   | {
       type: 'UPDATE_DRAG_OVER'
-      id: number
+      id: string
       category: Category
       isDragOver: boolean
     }
-  | { type: 'DELETE'; id: number; category: Category }
+  | { type: 'DELETE'; id: string; category: Category }
 
-type Category = 'todo' | 'doing' | 'done'
-type Item = { id: number; content: string; isDragOver: boolean }
+type Item = { id: string; content: string; isDragOver: boolean }
 type State = { [key in Category]: Item[] }
 
 const initialState: State = {
-  todo: [{ id: Date.now(), content: 'Task 4', isDragOver: false }],
-  doing: [{ id: Date.now() + 1, content: 'Task 3', isDragOver: false }],
-  done: [
-    { id: Date.now() + 2, content: 'Task 2', isDragOver: false },
-    { id: Date.now() + 3, content: 'Task 1', isDragOver: false },
-  ],
+  todo: [],
+  doing: [],
+  done: [],
 }
 
 const ItemDecoder = JD.object({
-  id: JD.number,
+  id: JD.string,
   content: JD.string,
   isDragOver: JD.boolean,
   category: JD.oneOf(['todo', 'doing', 'done']),
@@ -47,12 +45,44 @@ const ItemDecoder = JD.object({
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case 'SET_ITEMS': {
+      const { apiItems } = action
+      const data = apiItems.reduce(
+        (prev, { category, id, content }) => {
+          switch (category) {
+            case 'todo':
+              return {
+                ...prev,
+                todo: [...prev.todo, { id, content, isDragOver: false }],
+              }
+            case 'doing':
+              return {
+                ...prev,
+                doing: [...prev.todo, { id, content, isDragOver: false }],
+              }
+            case 'done':
+              return {
+                ...prev,
+                done: [...prev.done, { id, content, isDragOver: false }],
+              }
+          }
+        },
+        { todo: [], doing: [], done: [] } as {
+          todo: Item[]
+          doing: Item[]
+          done: Item[]
+        }
+      )
+      return {
+        ...state,
+        ...data,
+      }
+    }
     case 'CREATE': {
-      if (action.content.trim().length === 0) return state
       return {
         ...state,
         todo: [
-          { id: Date.now(), content: action.content, isDragOver: false },
+          { id: action.id, content: action.content, isDragOver: false },
           ...state.todo,
         ],
       }
@@ -120,12 +150,40 @@ function reducer(state: State, action: Action): State {
 const Home: NextPage = () => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [add, setAdd] = useState(false)
-  const [addInput, setAddInput] = useState('')
+  const [createItemInput, setCreateItemInput] = useState('')
   const { wallet } = useWallet()
+  const { createItem, allItems } = useApi()
 
-  const onAddInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+  useEffect(() => {
+    const fetchData = async (): Promise<void> => {
+      if (wallet.status !== 'connected') return
+      const apiItems = await allItems()
+      if (!apiItems) return
+      dispatch({ type: 'SET_ITEMS', apiItems })
+    }
+    fetchData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallet])
+
+  const onCreateItemInputChange = async (
+    event: ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
     const value = event.currentTarget.value
-    setAddInput(value)
+    setCreateItemInput(value)
+  }
+
+  const onCreateItem = async (): Promise<void> => {
+    if (wallet.status !== 'connected') return
+    if (createItemInput.trim().length === 0) return
+    try {
+      const id = await createItem(createItemInput)
+      if (id === null) return
+      dispatch({ type: 'CREATE', content: createItemInput, id })
+      setCreateItemInput('')
+      setAdd(false)
+    } catch (error) {
+      if (error instanceof Error) alert(error.message)
+    }
   }
 
   const Items = (items: Item[], category: Category): JSX.Element[] => {
@@ -233,28 +291,18 @@ const Home: NextPage = () => {
               <div className={styles.addItem}>
                 <input
                   type="text"
-                  onKeyUp={(e) => {
+                  onKeyUp={async (e) => {
                     if (e.code === 'Enter') {
                       e.preventDefault()
                       e.stopPropagation()
-                      dispatch({ type: 'CREATE', content: addInput })
-                      setAddInput('')
-                      setAdd(false)
+                      await onCreateItem()
                     }
                   }}
-                  onChange={onAddInputChange}
-                  value={addInput}
+                  onChange={onCreateItemInputChange}
+                  value={createItemInput}
                 />
                 <div>
-                  <button
-                    onClick={() => {
-                      dispatch({ type: 'CREATE', content: addInput })
-                      setAddInput('')
-                      setAdd(false)
-                    }}
-                  >
-                    Add
-                  </button>
+                  <button onClick={onCreateItem}>Add</button>
                   <button onClick={() => setAdd(false)}>Cancel</button>
                 </div>
               </div>
