@@ -71,12 +71,6 @@
   cursor: pointer;
 }
 
-.nav h1 {
-  font-size: 1.1em;
-  font-weight: 500;
-  align-self: center;
-}
-
 .content {
   height: calc(100% - 50px);
   flex-grow: 1;

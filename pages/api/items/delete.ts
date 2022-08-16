@@ -1,17 +1,19 @@
+import * as JD from 'decoders'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as jwt from '../libs/jwt'
 import ItemRepository from '../repositories/Item'
 
+const BodyDecoder = JD.object({
+  id: JD.string,
+})
+
 type Error = {
   status: 'error'
-  message: jwt.Error
+  message: 'Invalid body' | jwt.Error
 }
 
 type Success = {
   status: 'success'
-  body: {
-    data: { content: string; id: string; category: string }[]
-  }
 }
 
 type Result = Error | Success
@@ -28,19 +30,13 @@ export default async function handler(
   if (typeof decoded === 'string') {
     return res.status(400).json({ status: 'error', message: decoded })
   }
+  const decodedBody = BodyDecoder.value(req.body)
+  if (!decodedBody) {
+    return res.status(400).json({ status: 'error', message: 'Invalid body' })
+  }
 
   const itemRepository = await ItemRepository()
-  const items = await itemRepository
-    .search()
-    .where('address')
-    .equals(decoded.address)
-    .return.all()
+  await itemRepository.remove(decodedBody.id)
 
-  const data = items.map(({ entityId, category, content }) => ({
-    id: entityId,
-    category,
-    content,
-  }))
-
-  return res.status(200).json({ status: 'success', body: { data } })
+  return res.status(200).json({ status: 'success' })
 }

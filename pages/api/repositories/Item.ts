@@ -1,6 +1,14 @@
 import { Entity, Repository, Schema } from 'redis-om'
 import Client from '../libs/client'
 
+interface Item {
+  address: string
+  content: string
+  category: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 class Item extends Entity {}
 
 const itemSchema = new Schema(Item, {

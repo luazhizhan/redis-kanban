@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import useWallet from '../hooks/useWallet'
 import ConnectButton from './ConnectButton'
@@ -43,7 +44,12 @@ const Layout = (props: Props): JSX.Element => {
           <button onClick={() => isOpen(() => !open)}>
             <MenuIcon height={22} width={22} />
           </button>
-          <h1>Redis Kanban</h1>
+          <Image
+            src={'/logo-light.svg'}
+            width="100px"
+            height="100px"
+            alt="Redis Kanban"
+          />
         </nav>
         <div className={styles.content}>{children} </div>
       </div>

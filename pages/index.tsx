@@ -58,7 +58,7 @@ function reducer(state: State, action: Action): State {
             case 'doing':
               return {
                 ...prev,
-                doing: [...prev.todo, { id, content, isDragOver: false }],
+                doing: [...prev.doing, { id, content, isDragOver: false }],
               }
             case 'done':
               return {
@@ -87,7 +87,6 @@ function reducer(state: State, action: Action): State {
         ],
       }
     }
-
     case 'UPDATE_CATEGORY': {
       const { position, newCategory, oldCategory } = action
 
@@ -152,14 +151,18 @@ const Home: NextPage = () => {
   const [add, setAdd] = useState(false)
   const [createItemInput, setCreateItemInput] = useState('')
   const { wallet } = useWallet()
-  const { createItem, allItems } = useApi()
+  const { createItem, allItems, updateItem, deleteItem } = useApi()
 
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
       if (wallet.status !== 'connected') return
-      const apiItems = await allItems()
-      if (!apiItems) return
-      dispatch({ type: 'SET_ITEMS', apiItems })
+      try {
+        const apiItems = await allItems()
+        if (!apiItems) return
+        dispatch({ type: 'SET_ITEMS', apiItems })
+      } catch (error) {
+        if (error instanceof Error) alert(error.message)
+      }
     }
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -215,32 +218,51 @@ const Home: NextPage = () => {
             isDragOver: false,
           })
         }}
-        onDrop={(e: React.DragEvent<HTMLDivElement>) => {
+        onDrop={async (e: React.DragEvent<HTMLDivElement>) => {
           e.stopPropagation()
           const item = e.dataTransfer.getData('text/plain')
           const parsedItem = JSON.parse(item)
           const decodedItem = ItemDecoder.verify(parsedItem)
           const position = state[category].findIndex((i) => i.id === id)
-          dispatch({
-            type: 'UPDATE_CATEGORY',
-            id: decodedItem.id,
-            newCategory: category,
-            oldCategory: decodedItem.category,
-            position,
-          })
-          dispatch({
-            type: 'UPDATE_DRAG_OVER',
-            category,
-            id,
-            isDragOver: false,
-          })
+          try {
+            const returnId = await updateItem(
+              decodedItem.id,
+              decodedItem.content,
+              category
+            )
+            if (returnId === null) return
+            dispatch({
+              type: 'UPDATE_CATEGORY',
+              id: decodedItem.id,
+              newCategory: category,
+              oldCategory: decodedItem.category,
+              position,
+            })
+            dispatch({
+              type: 'UPDATE_DRAG_OVER',
+              category,
+              id,
+              isDragOver: false,
+            })
+          } catch (error) {
+            if (error instanceof Error) alert(error.message)
+          }
         }}
       >
         <div
           className={`${styles.itemContent} ${isDragOver ? styles.dashed : ''}`}
         >
           <h2>{content}</h2>
-          <button onClick={() => dispatch({ type: 'DELETE', category, id })}>
+          <button
+            onClick={async () => {
+              try {
+                await deleteItem(id)
+                dispatch({ type: 'DELETE', category, id })
+              } catch (error) {
+                if (error instanceof Error) alert(error.message)
+              }
+            }}
+          >
             <DeleteIcon height={13} width={13} />
           </button>
         </div>
@@ -248,20 +270,30 @@ const Home: NextPage = () => {
     ))
   }
 
-  const onItemsDrop = (
+  const onItemsDrop = async (
     e: React.DragEvent<HTMLDivElement>,
     newCategory: Category
-  ): void => {
+  ): Promise<void> => {
     const item = e.dataTransfer.getData('text/plain')
     const parsedItem = JSON.parse(item)
     const decodedItem = ItemDecoder.verify(parsedItem)
-    dispatch({
-      type: 'UPDATE_CATEGORY',
-      id: decodedItem.id,
-      newCategory,
-      oldCategory: decodedItem.category,
-      position: state[newCategory].length,
-    })
+    try {
+      const returnId = await updateItem(
+        decodedItem.id,
+        decodedItem.content,
+        newCategory
+      )
+      if (returnId === null) return
+      dispatch({
+        type: 'UPDATE_CATEGORY',
+        id: decodedItem.id,
+        newCategory,
+        oldCategory: decodedItem.category,
+        position: state[newCategory].length,
+      })
+    } catch (error) {
+      if (error instanceof Error) alert(error.message)
+    }
   }
 
   if (wallet.status !== 'connected') {

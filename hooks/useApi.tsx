@@ -10,6 +10,12 @@ type UseApi = {
   refresh: () => Promise<void>
   createItem: (content: string) => Promise<string | null>
   allItems: () => Promise<ApiItem[] | null>
+  updateItem: (
+    id: string,
+    content: string,
+    category: Category
+  ) => Promise<string | null>
+  deleteItem: (id: string) => Promise<void>
 }
 
 export type Category = 'todo' | 'doing' | 'done'
@@ -93,7 +99,50 @@ export default function useApi(): UseApi {
     return decodedData.body.data
   }
 
-  return { login, refresh, createItem, allItems }
+  const updateItem = async (
+    id: string,
+    content: string,
+    category: Category
+  ): Promise<string | null> => {
+    if (!jwt) return null
+    const response = await fetch('/api/items/update', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${jwt.token}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id,
+        content,
+        category,
+      }),
+    })
+    const data = await response.json()
+    const decodedData = UpdateItemDecoder.verify(data)
+    if (decodedData.status === 'error') throw new Error(decodedData.message)
+    return decodedData.body.id
+  }
+
+  const deleteItem = async (id: string): Promise<void> => {
+    if (!jwt) return
+    const response = await fetch('/api/items/delete', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${jwt.token}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id,
+      }),
+    })
+    const data = await response.json()
+    const decodedData = DeleteItemDecoder.verify(data)
+    if (decodedData.status === 'error') throw new Error(decodedData.message)
+  }
+
+  return { login, refresh, createItem, allItems, updateItem, deleteItem }
 }
 
 // Login API
@@ -122,8 +171,8 @@ const RefreshDecoder = JD.either(RefreshErrorDecoder, RefreshSuccessDecoder)
 const CreateItemErrorDecoder = JD.object({
   status: JD.constant('error'),
   message: JD.oneOf([
-    'Unauthorised',
     'Invalid body',
+    'Unauthorised',
     'Invalid JWT',
     'Expired JWT',
   ]),
@@ -140,12 +189,7 @@ const CreateItemDecoder = JD.either(
 // All Items API
 const AllItemsErrorDecoder = JD.object({
   status: JD.constant('error'),
-  message: JD.oneOf([
-    'Unauthorised',
-    'Invalid data',
-    'Invalid JWT',
-    'Expired JWT',
-  ]),
+  message: JD.oneOf(['Unauthorised', 'Invalid JWT', 'Expired JWT']),
 })
 const AllItemsSuccessDecoder = JD.object({
   status: JD.constant('success'),
@@ -160,3 +204,40 @@ const AllItemsSuccessDecoder = JD.object({
   }),
 })
 const AllItemsDecoder = JD.either(AllItemsErrorDecoder, AllItemsSuccessDecoder)
+
+// Update Item API
+const UpdateItemErrorDecoder = JD.object({
+  status: JD.constant('error'),
+  message: JD.oneOf([
+    'Invalid body',
+    'Unauthorised',
+    'Invalid JWT',
+    'Expired JWT',
+  ]),
+})
+const UpdateItemSuccessDecoder = JD.object({
+  status: JD.constant('success'),
+  body: JD.object({ id: JD.string }),
+})
+const UpdateItemDecoder = JD.either(
+  UpdateItemSuccessDecoder,
+  UpdateItemErrorDecoder
+)
+
+// Delete Item API
+const DeleteItemErrorDecoder = JD.object({
+  status: JD.constant('error'),
+  message: JD.oneOf([
+    'Invalid body',
+    'Unauthorised',
+    'Invalid JWT',
+    'Expired JWT',
+  ]),
+})
+const DeleteItemSuccessDecoder = JD.object({
+  status: JD.constant('success'),
+})
+const DeleteItemDecoder = JD.either(
+  DeleteItemErrorDecoder,
+  DeleteItemSuccessDecoder
+)
