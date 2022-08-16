@@ -8,7 +8,7 @@ type Disconnected = {
 
 type Connected = {
   status: 'connected'
-  accounts: string[]
+  account: string
 }
 
 export type Wallet = Connecting | Disconnected | Connected
