@@ -1,13 +1,14 @@
 import * as JD from 'decoders'
-import useJwt from './useJwt'
+import { useContext } from 'react'
+import { Context } from '../store/Store'
 
 type UseApi = {
   login: (
     address: string,
     message: string,
     signedMessage: string
-  ) => Promise<void>
-  refresh: () => Promise<void>
+  ) => Promise<string>
+  refresh: (jwt: string) => Promise<string>
   createItem: (content: string) => Promise<string | null>
   allItems: () => Promise<ApiItem[] | null>
   updateItem: (
@@ -23,13 +24,13 @@ export type Category = 'todo' | 'doing' | 'done'
 export type ApiItem = { id: string; content: string; category: Category }
 
 export default function useApi(): UseApi {
-  const [jwt, setJwt] = useJwt()
+  const { state } = useContext(Context)
 
   const login = async (
     address: string,
     message: string,
     signedMessage: string
-  ): Promise<void> => {
+  ): Promise<string> => {
     const response = await fetch('/api/login', {
       method: 'POST',
       headers: {
@@ -45,15 +46,14 @@ export default function useApi(): UseApi {
     const data = await response.json()
     const decodedData = LoginDecoder.verify(data)
     if (decodedData.status === 'error') throw new Error(decodedData.message)
-    setJwt({ address, token: decodedData.body.token })
+    return decodedData.body.token
   }
 
-  const refresh = async (): Promise<void> => {
-    if (!jwt) return
+  const refresh = async (jwt: string): Promise<string> => {
     const response = await fetch('/api/refresh', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${jwt.token}`,
+        Authorization: `Bearer ${jwt}`,
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
@@ -61,15 +61,15 @@ export default function useApi(): UseApi {
     const data = await response.json()
     const decodedData = RefreshDecoder.verify(data)
     if (decodedData.status === 'error') throw new Error(decodedData.message)
-    setJwt({ address: jwt.address, token: decodedData.body.token })
+    return decodedData.body.token
   }
 
   const createItem = async (content: string): Promise<string | null> => {
-    if (!jwt) return null
+    if (state.wallet.status !== 'connected') return null
     const response = await fetch('/api/items/create', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${jwt.token}`,
+        Authorization: `Bearer ${state.wallet.jwt}`,
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
@@ -84,11 +84,11 @@ export default function useApi(): UseApi {
   }
 
   const allItems = async (): Promise<ApiItem[] | null> => {
-    if (!jwt) return null
+    if (state.wallet.status !== 'connected') return null
     const response = await fetch('/api/items/all', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${jwt.token}`,
+        Authorization: `Bearer ${state.wallet.jwt}`,
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
@@ -104,11 +104,11 @@ export default function useApi(): UseApi {
     content: string,
     category: Category
   ): Promise<string | null> => {
-    if (!jwt) return null
+    if (state.wallet.status !== 'connected') return null
     const response = await fetch('/api/items/update', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${jwt.token}`,
+        Authorization: `Bearer ${state.wallet.jwt}`,
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
@@ -125,11 +125,11 @@ export default function useApi(): UseApi {
   }
 
   const deleteItem = async (id: string): Promise<void> => {
-    if (!jwt) return
+    if (state.wallet.status !== 'connected') return
     const response = await fetch('/api/items/delete', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${jwt.token}`,
+        Authorization: `Bearer ${state.wallet.jwt}`,
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },

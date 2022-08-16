@@ -9,6 +9,7 @@ type Disconnected = {
 type Connected = {
   status: 'connected'
   account: string
+  jwt: string
 }
 
 export type Wallet = Connecting | Disconnected | Connected

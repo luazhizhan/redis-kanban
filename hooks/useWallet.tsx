@@ -21,10 +21,11 @@ const useWallet = (): Return => {
     if (!jwt) return
 
     try {
-      await refresh()
+      const updatedJwt = await refresh(jwt.token)
+      setJwt({ address: jwt.address, token: updatedJwt })
       dispatch({
         type: 'SET_WALLET',
-        wallet: { status: 'connected', account: jwt.address },
+        wallet: { status: 'connected', account: jwt.address, jwt: updatedJwt },
       })
     } catch (error) {
       setJwt(null)
@@ -50,10 +51,12 @@ const useWallet = (): Return => {
         method: 'personal_sign',
         params: [msg, address],
       })
-      await login(address, message, signedMessage as string)
+      const newJwt = await login(address, message, signedMessage as string)
+      setJwt({ address, token: newJwt })
+
       dispatch({
         type: 'SET_WALLET',
-        wallet: { status: 'connected', account: address },
+        wallet: { status: 'connected', account: address, jwt: newJwt },
       })
     } catch (error) {
       alert((error as { message: string }).message)
