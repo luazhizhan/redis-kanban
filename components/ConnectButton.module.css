@@ -1,0 +1,16 @@
+.connect {
+  border: none;
+  background: #3c9df8;
+  color: #fff;
+  border-radius: 10px;
+  height: 40px;
+  min-width: 200px;
+  cursor: pointer;
+}
+.connect:hover {
+  background: #2492f9;
+}
+.connect:disabled {
+  background: #a2a2a2;
+  cursor: not-allowed;
+}

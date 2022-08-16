@@ -1,9 +1,11 @@
 import * as JD from 'decoders'
 import type { NextPage } from 'next'
 import { ChangeEvent, useReducer, useState } from 'react'
+import ConnectButton from '../components/ConnectButton'
 import Layout from '../components/Layout'
 import AddIcon from '../components/svgs/Add'
 import DeleteIcon from '../components/svgs/Delete'
+import useWallet from '../hooks/useWallet'
 import styles from './Index.module.css'
 
 type Action =
@@ -23,13 +25,6 @@ type Action =
     }
   | { type: 'DELETE'; id: number; category: Category }
 
-const ItemDecoder = JD.object({
-  id: JD.number,
-  content: JD.string,
-  isDragOver: JD.boolean,
-  category: JD.oneOf(['todo', 'doing', 'done']),
-})
-
 type Category = 'todo' | 'doing' | 'done'
 type Item = { id: number; content: string; isDragOver: boolean }
 type State = { [key in Category]: Item[] }
@@ -42,6 +37,14 @@ const initialState: State = {
     { id: Date.now() + 3, content: 'Task 1', isDragOver: false },
   ],
 }
+
+const ItemDecoder = JD.object({
+  id: JD.number,
+  content: JD.string,
+  isDragOver: JD.boolean,
+  category: JD.oneOf(['todo', 'doing', 'done']),
+})
+
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'CREATE': {
@@ -118,6 +121,7 @@ const Home: NextPage = () => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [add, setAdd] = useState(false)
   const [addInput, setAddInput] = useState('')
+  const { wallet } = useWallet()
 
   const onAddInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const value = event.currentTarget.value
@@ -200,6 +204,18 @@ const Home: NextPage = () => {
       oldCategory: decodedItem.category,
       position: state[newCategory].length,
     })
+  }
+
+  if (wallet.status !== 'connected') {
+    return (
+      <Layout>
+        <div className={styles.container}>
+          <section className={styles.connectContent}>
+            <ConnectButton />
+          </section>
+        </div>
+      </Layout>
+    )
   }
 
   return (

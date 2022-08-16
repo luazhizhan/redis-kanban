@@ -3,13 +3,18 @@
   width: 100%;
   height: 100%;
   justify-content: center;
+  background: #f6f8f9;
+}
+
+.connectContent {
+  padding: 1em;
+  align-self: center;
 }
 
 .content {
   display: flex;
   flex-direction: row;
   width: 100%;
-  background: #f6f8f9;
   padding: 1em;
   gap: 20px;
   overflow: auto;
