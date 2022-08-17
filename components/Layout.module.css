@@ -24,7 +24,7 @@
   justify-content: space-between;
   height: 55px;
   padding: 10px;
-  border-bottom: 1px solid rgb(238, 238, 238);
+  border-bottom: 1px solid var(--border1);
 }
 
 .nav > div {
@@ -33,7 +33,7 @@
 }
 
 .menu {
-  background: #f8f8f8;
+  background: var(--background2);
   cursor: pointer;
   border: none;
   padding: 8px;
@@ -43,7 +43,7 @@
 }
 
 .menu:hover {
-  border: 1px solid rgb(205, 205, 205);
+  border: 1px solid #cdcdcd;
 }
 
 .options {
@@ -51,7 +51,7 @@
   top: 55px;
   right: 10px;
   width: 200px;
-  background: #fff;
+  background: var(--background1);
   border-radius: 8px;
 }
 
@@ -66,23 +66,39 @@
   padding-bottom: 11px;
 }
 .options a:hover {
-  background: #eaeaea;
+  background: var(--hover1);
 }
-.options a span {
-  margin-top: -1px;
+
+.options button {
+  border: none;
+  background: no-repeat;
+  width: 100%;
+  display: flex;
+  border-radius: 5px;
+  gap: 5px;
+  justify-items: center;
+  padding: 15px;
+  padding-bottom: 11px;
+}
+.options button:hover {
+  background: var(--hover1);
+}
+.options button span {
+  color: var(--text1);
 }
 
 .connected {
   display: flex;
   align-items: center;
   border-radius: 10px;
-  background: #f0efef;
+  background: var(--background2);
   padding: 0px 2px;
   gap: 3px;
 }
 
 .connected button {
-  background: #f8f8f8;
+  background: var(--background3);
+  color: var(--text1);
   cursor: pointer;
   border: none;
   padding: 8px;

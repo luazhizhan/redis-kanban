@@ -7,6 +7,7 @@ import Layout from '../components/Layout'
 import AddIcon from '../components/svgs/Add'
 import DeleteIcon from '../components/svgs/Delete'
 import useApi, { AllItems, Category } from '../hooks/useApi'
+import useTheme from '../hooks/useTheme'
 import useWallet from '../hooks/useWallet'
 import styles from './Index.module.css'
 
@@ -143,6 +144,7 @@ const Home: NextPage = () => {
   const [createItemInput, setCreateItemInput] = useState('')
   const { wallet } = useWallet()
   const { createItem, allItems, updateItem, deleteItem } = useApi()
+  const [isDarkTheme] = useTheme()
 
   const ItemDecoder = JD.object({
     id: JD.string,
@@ -261,7 +263,11 @@ const Home: NextPage = () => {
               }
             }}
           >
-            <DeleteIcon height={17} width={17} />
+            <DeleteIcon
+              height={17}
+              width={17}
+              fill={isDarkTheme ? 'white' : 'black'}
+            />
           </button>
         </div>
       </div>
@@ -326,7 +332,11 @@ const Home: NextPage = () => {
               <div className={styles.todo}>
                 <h2>Todo</h2>
                 <button onClick={() => setAdd(true)}>
-                  <AddIcon height={17} width={17} />
+                  <AddIcon
+                    height={17}
+                    width={17}
+                    fill={isDarkTheme ? 'white' : 'black'}
+                  />
                 </button>
               </div>
               {add && (

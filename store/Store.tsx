@@ -1,23 +1,33 @@
 import { createContext, Dispatch, useReducer } from 'react'
+import { Theme } from './theme'
 import { Wallet } from './wallet'
 
-type Action = {
-  type: 'SET_WALLET'
-  wallet: Wallet
-}
+type Action =
+  | {
+      type: 'SET_WALLET'
+      wallet: Wallet
+    }
+  | {
+      type: 'SET_THEME'
+      theme: Theme
+    }
 
 type State = {
   wallet: Wallet
+  theme: Theme
 }
 
 const initialState: State = {
   wallet: { status: 'disconnected' },
+  theme: 'light',
 }
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_WALLET':
       return { ...state, wallet: action.wallet }
+    case 'SET_THEME':
+      return { ...state, theme: action.theme }
     default:
       return state
   }

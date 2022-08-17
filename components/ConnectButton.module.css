@@ -8,11 +8,11 @@
   min-width: 165px;
 }
 .connect:hover {
-  border: 1px solid #2492f9;
+  border: 1px solid #2792f7;
 }
 .connect:disabled {
-  background: #eeeeee;
-  color: #898989;
+  background: var(--backgound-disabled);
+  color: var(--text-disabled);
   opacity: 0.8;
   font-weight: 500;
   cursor: not-allowed;

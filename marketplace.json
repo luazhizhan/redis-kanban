@@ -17,7 +17,7 @@
   "language": ["TypeScript", "Node.js"],
   "redis_commands": [],
   "redis_features": [],
-  "redis_modules": ["RediJSON"],
+  "redis_modules": ["RediJSON", "RediSearch"],
   "app_image_urls": [
     "https://user-images.githubusercontent.com/16435270/185055969-522e034d-b62e-424b-8acd-a943186cf23e.png",
     "https://user-images.githubusercontent.com/16435270/185056735-6ff8016c-2f23-4790-b1cb-9bde046f169e.png",
