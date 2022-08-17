@@ -1,0 +1,30 @@
+{
+  "app_name": "Redis Kanban",
+  "description": "Kanban board build with Next.js, TypeScript and Redis.",
+  "hidden": "false",
+  "rank": 100,
+  "type": "Full App",
+  "contributed_by": "Community",
+  "repo_url": "https://github.com/luazhizhan/redis-kanban",
+  "download_url": "https://github.com/luazhizhan/redis-kanban/archive/refs/heads/main.zip",
+  "hosted_url": "https://redis-kanban.vercel.app/",
+  "quick_deploy": "true",
+  "deploy_buttons": [
+    {
+      "vercel": "https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fluazhizhan%2Fredis-kanban&env=JWT_SECRET,REDIS_CONNECTION_STRING"
+    }
+  ],
+  "language": ["TypeScript", "Node.js"],
+  "redis_commands": [],
+  "redis_features": [],
+  "redis_modules": ["RediJSON"],
+  "app_image_urls": [
+    "https://user-images.githubusercontent.com/16435270/185055969-522e034d-b62e-424b-8acd-a943186cf23e.png",
+    "https://user-images.githubusercontent.com/16435270/185056735-6ff8016c-2f23-4790-b1cb-9bde046f169e.png",
+    "https://user-images.githubusercontent.com/16435270/185056859-92d02b22-978a-4079-8708-7e9622d9b805.png"
+  ],
+  "youtube_url": "",
+  "special_tags": ["Hackathon"],
+  "verticals": [],
+  "markdown": "https://raw.githubusercontent.com/luazhizhan/redis-kanban/main/README.md"
+}
