@@ -262,7 +262,7 @@ const Home: NextPage = () => {
               }
             }}
           >
-            <DeleteIcon height={13} width={13} />
+            <DeleteIcon height={17} width={17} />
           </button>
         </div>
       </div>
@@ -316,7 +316,7 @@ const Home: NextPage = () => {
             <div className={styles.todo}>
               <h2>Todo</h2>
               <button onClick={() => setAdd(true)}>
-                <AddIcon height={15} width={15} />
+                <AddIcon height={17} width={17} />
               </button>
             </div>
             {add && (

@@ -43,6 +43,10 @@
   justify-content: space-between;
 }
 
+.todo button:hover {
+  transform: scale(1.1);
+}
+
 .items {
   display: flex;
   flex-direction: column;
@@ -55,13 +59,19 @@
 .items h2 {
   font-size: 0.8em;
   font-weight: normal;
-  max-width: 80%;
+  width: 80%;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .items > div {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  border-radius: 8px;
+  box-shadow: rgb(27 31 35 / 4%) 0px 1px 0px,
+    rgb(255 255 255 / 25%) 0px 1px 0px inset;
 }
 
 .addItem {
@@ -71,13 +81,19 @@
   background: white;
   height: fit-content;
   padding: 8px;
-  border-radius: 8px;
   margin-top: 5px;
 }
 .addItem input {
   outline: none;
+  height: 30px;
+  border: 1px solid #c6c6c6;
+  border-radius: 5px;
   font-size: 0.8em;
 }
+.addItem input:focus {
+  border: 1px solid #2492f9;
+}
+
 .addItem button {
   font-size: 0.8em;
   padding: 4px 8px;
@@ -113,5 +129,9 @@
   border-radius: 8px;
 }
 .itemContent.dashed {
-  border: 1px dashed black;
+  border: 1px dashed rgb(162, 162, 162);
+}
+
+.itemContent button:hover {
+  transform: scale(1.1);
 }

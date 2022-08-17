@@ -1,10 +1,10 @@
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import useWallet from '../hooks/useWallet'
 import ConnectButton from './ConnectButton'
 import styles from './Layout.module.css'
-import MenuIcon from './svgs/Menu'
-import UserCircleIcon from './svgs/UserCircle'
+import DotsVerticalIcon from './svgs/DotsVertical'
+import WalletIcon from './svgs/Wallet'
 
 type Props = {
   children: JSX.Element
@@ -12,15 +12,10 @@ type Props = {
 
 const Layout = (props: Props): JSX.Element => {
   const { children } = props
-  const [open, isOpen] = useState(false)
   const { wallet, onDisconnect, refreshSession } = useWallet()
 
-  const drawerStyle = open
-    ? `${styles.drawer} ${styles.open}`
-    : `${styles.drawer} ${styles.close}`
-
   const getDisplayAddress = (address: string): string =>
-    `${address.substring(0, 10)}....${address.substring(address.length - 10)}`
+    `${address.substring(0, 7)}...${address.substring(address.length - 7)}`
 
   useEffect(() => {
     refreshSession()
@@ -29,27 +24,29 @@ const Layout = (props: Props): JSX.Element => {
 
   return (
     <div className={styles.container}>
-      <div className={drawerStyle}>
-        {wallet.status === 'connected' ? (
-          <button className={styles.connected} onClick={onDisconnect}>
-            <UserCircleIcon height="22px" width="22px" />
-            <span>{getDisplayAddress(wallet.account)}</span>
-          </button>
-        ) : (
-          <ConnectButton />
-        )}
-      </div>
       <div className={styles.body}>
         <nav className={styles.nav}>
-          <button onClick={() => isOpen(() => !open)}>
-            <MenuIcon height={22} width={22} />
-          </button>
           <Image
             src={'/logo-light.svg'}
-            width="100px"
-            height="100px"
+            width="70px"
+            height="70px"
             alt="Redis Kanban"
           />
+          <div>
+            {wallet.status === 'connected' ? (
+              <div className={styles.connected}>
+                <WalletIcon height={20} width={20} />
+                <button onClick={onDisconnect}>
+                  <span>{getDisplayAddress(wallet.account)}</span>
+                </button>
+              </div>
+            ) : (
+              <ConnectButton />
+            )}
+            <button className={styles.menu}>
+              <DotsVerticalIcon height={20} width={20} />
+            </button>
+          </div>
         </nav>
         <div className={styles.content}>{children} </div>
       </div>

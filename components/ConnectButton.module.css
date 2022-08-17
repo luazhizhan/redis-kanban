@@ -3,14 +3,21 @@
   background: #3c9df8;
   color: #fff;
   border-radius: 10px;
-  height: 40px;
-  min-width: 200px;
+  padding: 8px;
   cursor: pointer;
+  min-width: 165px;
 }
 .connect:hover {
-  background: #2492f9;
+  border: 1px solid #2492f9;
 }
 .connect:disabled {
-  background: #a2a2a2;
+  background: #eeeeee;
+  color: #898989;
+  opacity: 0.8;
+  font-weight: 500;
   cursor: not-allowed;
+}
+
+.connect:disabled:hover {
+  border: none;
 }

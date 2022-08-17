@@ -1,7 +1,6 @@
 import type { AppProps } from 'next/app'
 import { useEffect, useState } from 'react'
 import { Provider } from '../store/Store'
-import '../styles/github-corner.css'
 import '../styles/globals.css'
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {

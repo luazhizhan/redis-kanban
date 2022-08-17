@@ -3,17 +3,15 @@ import { SVGAttributes } from 'react'
 const DeleteIcon = (props: SVGAttributes<SVGSVGElement>): JSX.Element => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
+    className="h-5 w-5"
+    viewBox="0 0 20 20"
+    fill="currentColor"
     {...props}
   >
     <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m19 7-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"
+      fillRule="evenodd"
+      d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414z"
+      clipRule="evenodd"
     />
   </svg>
 )
