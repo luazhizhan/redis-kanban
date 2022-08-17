@@ -225,12 +225,6 @@ const Home: NextPage = () => {
           const decodedItem = ItemDecoder.verify(parsedItem)
           const position = state[category].findIndex((i) => i.id === id)
           try {
-            const returnId = await updateItem(
-              decodedItem.id,
-              decodedItem.content,
-              category
-            )
-            if (returnId === null) return
             dispatch({
               type: 'UPDATE_CATEGORY',
               id: decodedItem.id,
@@ -244,6 +238,7 @@ const Home: NextPage = () => {
               id,
               isDragOver: false,
             })
+            await updateItem(decodedItem.id, decodedItem.content, category)
           } catch (error) {
             if (error instanceof Error) alert(error.message)
           }
@@ -256,8 +251,8 @@ const Home: NextPage = () => {
           <button
             onClick={async () => {
               try {
-                await deleteItem(id)
                 dispatch({ type: 'DELETE', category, id })
+                await deleteItem(id)
               } catch (error) {
                 if (error instanceof Error) alert(error.message)
               }
@@ -278,12 +273,6 @@ const Home: NextPage = () => {
     const parsedItem = JSON.parse(item)
     const decodedItem = ItemDecoder.verify(parsedItem)
     try {
-      const returnId = await updateItem(
-        decodedItem.id,
-        decodedItem.content,
-        newCategory
-      )
-      if (returnId === null) return
       dispatch({
         type: 'UPDATE_CATEGORY',
         id: decodedItem.id,
@@ -291,6 +280,7 @@ const Home: NextPage = () => {
         oldCategory: decodedItem.category,
         position: state[newCategory].length,
       })
+      await updateItem(decodedItem.id, decodedItem.content, newCategory)
     } catch (error) {
       if (error instanceof Error) alert(error.message)
     }
