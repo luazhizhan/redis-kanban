@@ -119,7 +119,7 @@ Example of retrieving Kanban items order of `todo` column belonging a specific u
 
 ### Local installation
 
-Complete the software installation for you require by following the instructions in the links above.
+Complete the software installation you require by following the instructions in the links above.
 
 Please find out how to start `Redis Stack` by looking at the instructions given in your chosen installation method.
 
