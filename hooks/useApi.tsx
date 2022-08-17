@@ -151,6 +151,8 @@ export default function useApi(): UseApi {
   return { login, refresh, createItem, allItems, updateItem, deleteItem }
 }
 
+/* Decoders */
+
 // Login API
 const LoginErrorDecoder = JD.object({
   status: JD.constant('error'),

@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "vercel dev",
-    "next:start": "next start",
+    "start": "next start",
+    "dev": "next dev",
+    "vercel": "vercel dev",
     "lint": "next lint",
     "pretty": "prettier --write \"**.{ts,tsx,json,css}\"",
     "pretty:check": "prettier --check \"**.{ts,tsx,json,css}\"",

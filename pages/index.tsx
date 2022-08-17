@@ -1,5 +1,6 @@
 import * as JD from 'decoders'
 import type { NextPage } from 'next'
+import Head from 'next/head'
 import { ChangeEvent, useEffect, useReducer, useState } from 'react'
 import ConnectButton from '../components/ConnectButton'
 import Layout from '../components/Layout'
@@ -29,19 +30,6 @@ type Action =
 
 type Item = { id: string; content: string; isDragOver: boolean }
 type State = { [key in Category]: Item[] }
-
-const initialState: State = {
-  todo: [],
-  doing: [],
-  done: [],
-}
-
-const ItemDecoder = JD.object({
-  id: JD.string,
-  content: JD.string,
-  isDragOver: JD.boolean,
-  category: JD.oneOf(['todo', 'doing', 'done']),
-})
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -146,11 +134,22 @@ function reducer(state: State, action: Action): State {
 }
 
 const Home: NextPage = () => {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, {
+    todo: [],
+    doing: [],
+    done: [],
+  })
   const [add, setAdd] = useState(false)
   const [createItemInput, setCreateItemInput] = useState('')
   const { wallet } = useWallet()
   const { createItem, allItems, updateItem, deleteItem } = useApi()
+
+  const ItemDecoder = JD.object({
+    id: JD.string,
+    content: JD.string,
+    isDragOver: JD.boolean,
+    category: JD.oneOf(['todo', 'doing', 'done']),
+  })
 
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
@@ -296,80 +295,92 @@ const Home: NextPage = () => {
     }
   }
 
+  const IndexHead = (): JSX.Element => (
+    <Head>
+      <title>Redis Kanban</title>
+    </Head>
+  )
+
   if (wallet.status !== 'connected') {
     return (
-      <Layout>
-        <div className={styles.container}>
-          <section className={styles.connectContent}>
-            <ConnectButton />
-          </section>
-        </div>
-      </Layout>
+      <>
+        <IndexHead />
+        <Layout>
+          <div className={styles.container}>
+            <section className={styles.connectContent}>
+              <ConnectButton />
+            </section>
+          </div>
+        </Layout>
+      </>
     )
   }
 
   return (
-    <Layout>
-      <div className={styles.container}>
-        <section className={styles.content}>
-          <div>
-            <div className={styles.todo}>
-              <h2>Todo</h2>
-              <button onClick={() => setAdd(true)}>
-                <AddIcon height={17} width={17} />
-              </button>
-            </div>
-            {add && (
-              <div className={styles.addItem}>
-                <input
-                  type="text"
-                  onKeyUp={async (e) => {
-                    if (e.code === 'Enter') {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      await onCreateItem()
-                    }
-                  }}
-                  onChange={onCreateItemInputChange}
-                  value={createItemInput}
-                />
-                <div>
-                  <button onClick={onCreateItem}>Add</button>
-                  <button onClick={() => setAdd(false)}>Cancel</button>
-                </div>
+    <>
+      <IndexHead />
+      <Layout>
+        <div className={styles.container}>
+          <section className={styles.content}>
+            <div>
+              <div className={styles.todo}>
+                <h2>Todo</h2>
+                <button onClick={() => setAdd(true)}>
+                  <AddIcon height={17} width={17} />
+                </button>
               </div>
-            )}
-            <div
-              className={styles.items}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => onItemsDrop(e, 'todo')}
-            >
-              {Items(state.todo, 'todo')}
+              {add && (
+                <div className={styles.addItem}>
+                  <input
+                    type="text"
+                    onKeyUp={async (e) => {
+                      if (e.code === 'Enter') {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        await onCreateItem()
+                      }
+                    }}
+                    onChange={onCreateItemInputChange}
+                    value={createItemInput}
+                  />
+                  <div>
+                    <button onClick={onCreateItem}>Add</button>
+                    <button onClick={() => setAdd(false)}>Cancel</button>
+                  </div>
+                </div>
+              )}
+              <div
+                className={styles.items}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => onItemsDrop(e, 'todo')}
+              >
+                {Items(state.todo, 'todo')}
+              </div>
             </div>
-          </div>
-          <div>
-            <h2>Doing</h2>
-            <div
-              className={styles.items}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => onItemsDrop(e, 'doing')}
-            >
-              {Items(state.doing, 'doing')}
+            <div>
+              <h2>Doing</h2>
+              <div
+                className={styles.items}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => onItemsDrop(e, 'doing')}
+              >
+                {Items(state.doing, 'doing')}
+              </div>
             </div>
-          </div>
-          <div>
-            <h2>Done</h2>
-            <div
-              className={styles.items}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => onItemsDrop(e, 'done')}
-            >
-              {Items(state.done, 'done')}
+            <div>
+              <h2>Done</h2>
+              <div
+                className={styles.items}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => onItemsDrop(e, 'done')}
+              >
+                {Items(state.done, 'done')}
+              </div>
             </div>
-          </div>
-        </section>
-      </div>
-    </Layout>
+          </section>
+        </div>
+      </Layout>
+    </>
   )
 }
 
