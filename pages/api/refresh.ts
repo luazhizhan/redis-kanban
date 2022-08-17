@@ -8,7 +8,7 @@ type Error = {
 
 type Success = {
   status: 'success'
-  body: {
+  data: {
     token: string
   }
 }
@@ -31,5 +31,5 @@ export default function handler(
 
   return res
     .status(200)
-    .json({ status: 'success', body: { token: jwt.issue(decoded.address) } })
+    .json({ status: 'success', data: { token: jwt.issue(decoded.address) } })
 }

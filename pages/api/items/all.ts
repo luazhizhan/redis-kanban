@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as jwt from '../libs/jwt'
 import ItemRepository from '../repositories/Item'
+import ItemOrderRepository from '../repositories/ItemOrder'
 
 type Error = {
   status: 'error'
@@ -9,8 +10,13 @@ type Error = {
 
 type Success = {
   status: 'success'
-  body: {
-    data: { content: string; id: string; category: string }[]
+  data: {
+    items: {
+      content: string
+      id: string
+      category: string
+    }[]
+    orders: Record<string, string[]>
   }
 }
 
@@ -30,17 +36,28 @@ export default async function handler(
   }
 
   const itemRepository = await ItemRepository()
-  const items = await itemRepository
+  const itemQuery = await itemRepository
     .search()
     .where('address')
     .equals(decoded.address)
     .return.all()
 
-  const data = items.map(({ entityId, category, content }) => ({
+  const items = itemQuery.map(({ entityId, category, content }) => ({
     id: entityId,
     category,
     content,
   }))
+  const itemOrderRepository = await ItemOrderRepository()
+  const itemOrderQuery = await itemOrderRepository
+    .search()
+    .where('address')
+    .equals(decoded.address)
+    .return.all()
 
-  return res.status(200).json({ status: 'success', body: { data } })
+  const orders = itemOrderQuery.reduce((prev, { category, order }) => {
+    prev[category] = order
+    return prev
+  }, {} as Record<string, string[]>)
+
+  return res.status(200).json({ status: 'success', data: { items, orders } })
 }

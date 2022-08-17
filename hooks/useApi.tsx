@@ -10,18 +10,22 @@ type UseApi = {
   ) => Promise<string>
   refresh: (jwt: string) => Promise<string>
   createItem: (content: string) => Promise<string | null>
-  allItems: () => Promise<ApiItem[] | null>
+  allItems: () => Promise<AllItems | null>
   updateItem: (
     id: string,
     content: string,
-    category: Category
+    category: Category,
+    position: number
   ) => Promise<string | null>
   deleteItem: (id: string) => Promise<void>
 }
 
 export type Category = 'todo' | 'doing' | 'done'
 
-export type ApiItem = { id: string; content: string; category: Category }
+export type AllItems = {
+  items: { id: string; content: string; category: Category }[]
+  orders: Record<string, string[]>
+}
 
 export default function useApi(): UseApi {
   const { state } = useContext(Context)
@@ -46,7 +50,7 @@ export default function useApi(): UseApi {
     const data = await response.json()
     const decodedData = LoginDecoder.verify(data)
     if (decodedData.status === 'error') throw new Error(decodedData.message)
-    return decodedData.body.token
+    return decodedData.data.token
   }
 
   const refresh = async (jwt: string): Promise<string> => {
@@ -61,7 +65,7 @@ export default function useApi(): UseApi {
     const data = await response.json()
     const decodedData = RefreshDecoder.verify(data)
     if (decodedData.status === 'error') throw new Error(decodedData.message)
-    return decodedData.body.token
+    return decodedData.data.token
   }
 
   const createItem = async (content: string): Promise<string | null> => {
@@ -80,10 +84,10 @@ export default function useApi(): UseApi {
     const data = await response.json()
     const decodedData = CreateItemDecoder.verify(data)
     if (decodedData.status === 'error') throw new Error(decodedData.message)
-    return decodedData.body.id
+    return decodedData.data.id
   }
 
-  const allItems = async (): Promise<ApiItem[] | null> => {
+  const allItems = async (): Promise<AllItems | null> => {
     if (state.wallet.status !== 'connected') return null
     const response = await fetch('/api/items/all', {
       method: 'POST',
@@ -96,13 +100,14 @@ export default function useApi(): UseApi {
     const data = await response.json()
     const decodedData = AllItemsDecoder.verify(data)
     if (decodedData.status === 'error') throw new Error(decodedData.message)
-    return decodedData.body.data
+    return decodedData.data
   }
 
   const updateItem = async (
     id: string,
     content: string,
-    category: Category
+    category: Category,
+    position: number
   ): Promise<string | null> => {
     if (state.wallet.status !== 'connected') return null
     const response = await fetch('/api/items/update', {
@@ -116,12 +121,13 @@ export default function useApi(): UseApi {
         id,
         content,
         category,
+        position,
       }),
     })
     const data = await response.json()
     const decodedData = UpdateItemDecoder.verify(data)
     if (decodedData.status === 'error') throw new Error(decodedData.message)
-    return decodedData.body.id
+    return decodedData.data.id
   }
 
   const deleteItem = async (id: string): Promise<void> => {
@@ -152,7 +158,7 @@ const LoginErrorDecoder = JD.object({
 })
 const LoginSuccessDecoder = JD.object({
   status: JD.constant('success'),
-  body: JD.object({ token: JD.string }),
+  data: JD.object({ token: JD.string }),
 })
 const LoginDecoder = JD.either(LoginErrorDecoder, LoginSuccessDecoder)
 
@@ -163,7 +169,7 @@ const RefreshErrorDecoder = JD.object({
 })
 const RefreshSuccessDecoder = JD.object({
   status: JD.constant('success'),
-  body: JD.object({ token: JD.string }),
+  data: JD.object({ token: JD.string }),
 })
 const RefreshDecoder = JD.either(RefreshErrorDecoder, RefreshSuccessDecoder)
 
@@ -179,7 +185,7 @@ const CreateItemErrorDecoder = JD.object({
 })
 const CreateItemSuccessDecoder = JD.object({
   status: JD.constant('success'),
-  body: JD.object({ id: JD.string }),
+  data: JD.object({ id: JD.string }),
 })
 const CreateItemDecoder = JD.either(
   CreateItemSuccessDecoder,
@@ -193,14 +199,15 @@ const AllItemsErrorDecoder = JD.object({
 })
 const AllItemsSuccessDecoder = JD.object({
   status: JD.constant('success'),
-  body: JD.object({
-    data: JD.array(
+  data: JD.object({
+    items: JD.array(
       JD.object({
         id: JD.string,
         content: JD.string,
         category: JD.oneOf(['todo', 'doing', 'done']),
       })
     ),
+    orders: JD.dict(JD.array(JD.string)),
   }),
 })
 const AllItemsDecoder = JD.either(AllItemsErrorDecoder, AllItemsSuccessDecoder)
@@ -210,6 +217,7 @@ const UpdateItemErrorDecoder = JD.object({
   status: JD.constant('error'),
   message: JD.oneOf([
     'Invalid body',
+    'Item order not found',
     'Unauthorised',
     'Invalid JWT',
     'Expired JWT',
@@ -217,7 +225,7 @@ const UpdateItemErrorDecoder = JD.object({
 })
 const UpdateItemSuccessDecoder = JD.object({
   status: JD.constant('success'),
-  body: JD.object({ id: JD.string }),
+  data: JD.object({ id: JD.string }),
 })
 const UpdateItemDecoder = JD.either(
   UpdateItemSuccessDecoder,

@@ -2,6 +2,7 @@ import * as JD from 'decoders'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as jwt from '../libs/jwt'
 import ItemRepository from '../repositories/Item'
+import ItemOrderRepository from '../repositories/ItemOrder'
 
 const BodyDecoder = JD.object({
   id: JD.string,
@@ -37,6 +38,21 @@ export default async function handler(
 
   const itemRepository = await ItemRepository()
   await itemRepository.remove(decodedBody.id)
+
+  // Update item orders
+  const itemOrderRepository = await ItemOrderRepository()
+  const itemOrder = await itemOrderRepository
+    .search()
+    .where('address')
+    .equals(decoded.address)
+    .and('category')
+    .equals('todo')
+    .return.first()
+
+  if (itemOrder) {
+    itemOrder.order = itemOrder.order.filter((id) => id !== decodedBody.id)
+    await itemOrderRepository.save(itemOrder)
+  }
 
   return res.status(200).json({ status: 'success' })
 }

@@ -2,6 +2,7 @@ import * as JD from 'decoders'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as jwt from '../libs/jwt'
 import ItemRepository from '../repositories/Item'
+import ItemOrderRepository from '../repositories/ItemOrder'
 
 const BodyDecoder = JD.object({
   content: JD.string,
@@ -14,7 +15,7 @@ type Error = {
 
 type Success = {
   status: 'success'
-  body: {
+  data: {
     id: string
   }
 }
@@ -38,6 +39,7 @@ export default async function handler(
     return res.status(400).json({ status: 'error', message: 'Invalid body' })
   }
 
+  // Create item
   const itemRepository = await ItemRepository()
   const now = new Date()
   const item = await itemRepository.createAndSave({
@@ -47,7 +49,28 @@ export default async function handler(
     createdAt: now,
     updatedAt: now,
   })
+
+  // Update item orders
+  const itemOrderRepository = await ItemOrderRepository()
+  const itemOrder = await itemOrderRepository
+    .search()
+    .where('address')
+    .equals(decoded.address)
+    .and('category')
+    .equals('todo')
+    .return.first()
+  if (itemOrder) {
+    itemOrder.order = [item.entityId, ...itemOrder.order]
+    await itemOrderRepository.save(itemOrder)
+  } else {
+    await itemOrderRepository.createAndSave({
+      address: decoded.address,
+      category: 'todo',
+      order: [item.entityId],
+    })
+  }
+
   return res
     .status(200)
-    .json({ status: 'success', body: { id: item.entityId } })
+    .json({ status: 'success', data: { id: item.entityId } })
 }

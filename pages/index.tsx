@@ -5,12 +5,12 @@ import ConnectButton from '../components/ConnectButton'
 import Layout from '../components/Layout'
 import AddIcon from '../components/svgs/Add'
 import DeleteIcon from '../components/svgs/Delete'
-import useApi, { ApiItem, Category } from '../hooks/useApi'
+import useApi, { AllItems, Category } from '../hooks/useApi'
 import useWallet from '../hooks/useWallet'
 import styles from './Index.module.css'
 
 type Action =
-  | { type: 'SET_ITEMS'; apiItems: ApiItem[] }
+  | { type: 'SET_ITEMS'; allItems: AllItems }
   | { type: 'CREATE'; content: string; id: string }
   | {
       type: 'UPDATE_CATEGORY'
@@ -46,8 +46,8 @@ const ItemDecoder = JD.object({
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_ITEMS': {
-      const { apiItems } = action
-      const data = apiItems.reduce(
+      const { allItems } = action
+      const items = allItems.items.reduce(
         (prev, { category, id, content }) => {
           switch (category) {
             case 'todo':
@@ -73,9 +73,24 @@ function reducer(state: State, action: Action): State {
           done: Item[]
         }
       )
+      const todoOrders = allItems.orders['todo'] || []
+      const doingOrders = allItems.orders['doing'] || []
+      const doneOrders = allItems.orders['done'] || []
+      const todo = todoOrders
+        .map((id) => items.todo.find((item) => item.id === id))
+        .filter((x): x is Item => x !== undefined)
+      const doing = doingOrders
+        .map((id) => items.doing.find((item) => item.id === id))
+        .filter((x): x is Item => x !== undefined)
+      const done = doneOrders
+        .map((id) => items.done.find((item) => item.id === id))
+        .filter((x): x is Item => x !== undefined)
+
       return {
         ...state,
-        ...data,
+        todo,
+        doing,
+        done,
       }
     }
     case 'CREATE': {
@@ -89,35 +104,19 @@ function reducer(state: State, action: Action): State {
     }
     case 'UPDATE_CATEGORY': {
       const { position, newCategory, oldCategory } = action
+      const item = state[oldCategory].find(({ id }) => id === action.id)
+      if (!item) return state
 
-      const { oldPosition, found } = (() => {
-        const index = state[oldCategory].findIndex(
-          (item) => item.id === action.id
-        )
-        return { oldPosition: index, found: state[oldCategory][index] }
-      })()
-      if (oldPosition === -1) return state
-      if (newCategory === oldCategory && position === oldPosition) return state
-
-      const filtered = state[oldCategory].filter(
-        (item) => item.id !== action.id
-      )
+      const filtered = state[oldCategory].filter(({ id }) => id !== action.id)
       const newCategoryList =
         newCategory === oldCategory ? filtered : [...state[newCategory]]
-      if (position === 0) {
-        return {
-          ...state,
-          [oldCategory]: filtered,
-          [newCategory]: [found, ...newCategoryList],
-        }
-      }
 
       return {
         ...state,
         [oldCategory]: filtered,
         [newCategory]: [
           ...newCategoryList.slice(0, position),
-          found,
+          item,
           ...newCategoryList.slice(position),
         ],
       }
@@ -157,9 +156,9 @@ const Home: NextPage = () => {
     const fetchData = async (): Promise<void> => {
       if (wallet.status !== 'connected') return
       try {
-        const apiItems = await allItems()
-        if (!apiItems) return
-        dispatch({ type: 'SET_ITEMS', apiItems })
+        const data = await allItems()
+        if (!data) return
+        dispatch({ type: 'SET_ITEMS', allItems: data })
       } catch (error) {
         if (error instanceof Error) alert(error.message)
       }
@@ -238,7 +237,12 @@ const Home: NextPage = () => {
               id,
               isDragOver: false,
             })
-            await updateItem(decodedItem.id, decodedItem.content, category)
+            await updateItem(
+              decodedItem.id,
+              decodedItem.content,
+              category,
+              position
+            )
           } catch (error) {
             if (error instanceof Error) alert(error.message)
           }
@@ -272,15 +276,21 @@ const Home: NextPage = () => {
     const item = e.dataTransfer.getData('text/plain')
     const parsedItem = JSON.parse(item)
     const decodedItem = ItemDecoder.verify(parsedItem)
+    const position = state[newCategory].length
     try {
       dispatch({
         type: 'UPDATE_CATEGORY',
         id: decodedItem.id,
         newCategory,
         oldCategory: decodedItem.category,
-        position: state[newCategory].length,
+        position,
       })
-      await updateItem(decodedItem.id, decodedItem.content, newCategory)
+      await updateItem(
+        decodedItem.id,
+        decodedItem.content,
+        newCategory,
+        position
+      )
     } catch (error) {
       if (error instanceof Error) alert(error.message)
     }
