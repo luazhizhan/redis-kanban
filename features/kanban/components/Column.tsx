@@ -60,8 +60,13 @@ export function Column(props: Props): JSX.Element {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <h2 style={{ background: headerStyle }}>{category}</h2>
-        <button onClick={() => setShowCreateItem(true)}>
+        <span>
+          <h2 className={styles.header} style={{ background: headerStyle }}>
+            {category}
+          </h2>
+          <span>{state[category].length}</span>
+        </span>
+        <button className={styles.add} onClick={() => setShowCreateItem(true)}>
           <AddIcon
             height={17}
             width={17}

@@ -3,7 +3,7 @@
   max-width: 350px;
 }
 
-.container button {
+.add {
   background: none;
   border: none;
   cursor: pointer;
@@ -11,7 +11,7 @@
   border-radius: 5px;
   border: 1px solid transparent;
 }
-.container button:hover {
+.add:hover {
   background: var(--background3);
   border: 1px solid var(--border2);
 }
@@ -23,7 +23,17 @@
   margin-bottom: 4px;
 }
 
-.content > h2 {
+.content > span {
+  display: flex;
+  gap: 10px;
+}
+
+.content > span > span {
+  margin-top: 6px;
+  opacity: 0.8;
+}
+
+.header {
   font-size: 15px;
   font-weight: 400;
   text-transform: capitalize;

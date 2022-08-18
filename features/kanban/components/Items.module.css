@@ -26,6 +26,12 @@
   text-overflow: ellipsis;
 }
 
+.content button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 .menu {
   display: flex;
   padding: 5px;
