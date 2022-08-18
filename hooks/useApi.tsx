@@ -9,7 +9,7 @@ type UseApi = {
     signedMessage: string
   ) => Promise<string>
   refresh: (jwt: string) => Promise<string>
-  createItem: (content: string) => Promise<string | null>
+  createItem: (content: string, category: Category) => Promise<string | null>
   allItems: () => Promise<AllItems | null>
   updateItem: (
     id: string,
@@ -68,7 +68,10 @@ export default function useApi(): UseApi {
     return decodedData.data.token
   }
 
-  const createItem = async (content: string): Promise<string | null> => {
+  const createItem = async (
+    content: string,
+    category: Category
+  ): Promise<string | null> => {
     if (state.wallet.status !== 'connected') return null
     const response = await fetch('/api/items/create', {
       method: 'POST',
@@ -79,6 +82,7 @@ export default function useApi(): UseApi {
       },
       body: JSON.stringify({
         content,
+        category,
       }),
     })
     const data = await response.json()

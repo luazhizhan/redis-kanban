@@ -1,0 +1,42 @@
+.container {
+  min-width: 250px;
+  max-width: 350px;
+}
+
+.container button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+}
+.container button:hover {
+  background: var(--background3);
+  border: 1px solid var(--border2);
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.content > h2 {
+  font-size: 15px;
+  font-weight: 400;
+  text-transform: capitalize;
+  align-self: center;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  min-height: 90%;
+  padding-bottom: 16px;
+  gap: 8px;
+  overflow: auto;
+}

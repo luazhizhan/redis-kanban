@@ -2,7 +2,7 @@ import { AllItems, Category } from '../../hooks/useApi'
 
 export type Action =
   | { type: 'SET_ITEMS'; allItems: AllItems }
-  | { type: 'CREATE'; content: string; id: string }
+  | { type: 'CREATE'; category: Category; content: string; id: string }
   | {
       type: 'UPDATE_CATEGORY'
       newCategory: Category
@@ -99,14 +99,14 @@ export function reducer(state: State, action: Action): State {
     case 'CREATE': {
       return {
         ...state,
-        todo: [
+        [action.category]: [
           {
             id: action.id,
             content: action.content,
             isDragOver: false,
             isHover: false,
           },
-          ...state.todo,
+          ...state[action.category],
         ],
       }
     }

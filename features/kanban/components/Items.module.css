@@ -17,6 +17,14 @@
 .content.dashed {
   border: 1px dashed rgb(162, 162, 162);
 }
+.content h2 {
+  font-size: 14px;
+  font-weight: normal;
+  width: 80%;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .menu {
   display: flex;
@@ -34,5 +42,5 @@
 }
 .menu.hide {
   opacity: 0;
-  transition: opacity 0.2s easen-out;
+  transition: opacity 0.2s ease-out;
 }

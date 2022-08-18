@@ -1,18 +1,17 @@
 import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react'
-import useApi from '../../../hooks/useApi'
+import useApi, { Category } from '../../../hooks/useApi'
 import useWallet from '../../../hooks/useWallet'
 import { Action } from '../store'
 import styles from './CreateItem.module.css'
 
 type Props = {
-  useShow: [boolean, Dispatch<SetStateAction<boolean>>]
+  setShow: Dispatch<SetStateAction<boolean>>
   dispatch: Dispatch<Action>
+  category: Category
 }
 
 export default function CreateItem(props: Props): JSX.Element {
-  const { useShow, dispatch } = props
-  const [show, setShow] = useShow
-
+  const { setShow, dispatch, category } = props
   const [createItemInput, setCreateItemInput] = useState('')
   const { wallet } = useWallet()
   const { createItem } = useApi()
@@ -28,9 +27,14 @@ export default function CreateItem(props: Props): JSX.Element {
     if (wallet.status !== 'connected') return
     if (createItemInput.trim().length === 0) return
     try {
-      const id = await createItem(createItemInput)
+      const id = await createItem(createItemInput, category)
       if (id === null) return
-      dispatch({ type: 'CREATE', content: createItemInput, id })
+      dispatch({
+        type: 'CREATE',
+        content: createItemInput,
+        id,
+        category,
+      })
       setCreateItemInput('')
       setShow(false)
     } catch (error) {
@@ -39,29 +43,25 @@ export default function CreateItem(props: Props): JSX.Element {
   }
 
   return (
-    <>
-      {show && (
-        <div className={styles.container}>
-          <input
-            type="text"
-            placeholder="Type a name"
-            autoFocus={true}
-            onKeyUp={async (e) => {
-              if (e.code === 'Enter') {
-                e.preventDefault()
-                e.stopPropagation()
-                await onCreateItem()
-              }
-            }}
-            onChange={onCreateItemInputChange}
-            value={createItemInput}
-          />
-          <div>
-            <button onClick={onCreateItem}>Add</button>
-            <button onClick={() => setShow(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
-    </>
+    <div className={styles.container}>
+      <input
+        type="text"
+        placeholder="Type a name"
+        autoFocus={true}
+        onKeyUp={async (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            e.stopPropagation()
+            await onCreateItem()
+          }
+        }}
+        onChange={onCreateItemInputChange}
+        value={createItemInput}
+      />
+      <div>
+        <button onClick={onCreateItem}>Add</button>
+        <button onClick={() => setShow(false)}>Cancel</button>
+      </div>
+    </div>
   )
 }

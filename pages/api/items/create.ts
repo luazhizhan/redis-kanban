@@ -6,6 +6,7 @@ import ItemOrderRepository from '../repositories/ItemOrder'
 
 const BodyDecoder = JD.object({
   content: JD.string,
+  category: JD.oneOf(['todo', 'doing', 'done']),
 })
 
 type Error = {
@@ -45,7 +46,6 @@ export default async function handler(
   const item = await itemRepository.createAndSave({
     ...decodedBody,
     address: decoded.address,
-    category: 'todo',
     createdAt: now,
     updatedAt: now,
   })
@@ -57,7 +57,7 @@ export default async function handler(
     .where('address')
     .equals(decoded.address)
     .and('category')
-    .equals('todo')
+    .equals(decodedBody.category)
     .return.first()
   if (itemOrder) {
     itemOrder.order = [item.entityId, ...itemOrder.order]
@@ -65,7 +65,7 @@ export default async function handler(
   } else {
     await itemOrderRepository.createAndSave({
       address: decoded.address,
-      category: 'todo',
+      category: decodedBody.category,
       order: [item.entityId],
     })
   }

@@ -44,7 +44,7 @@ export default function Items(props: Props): JSX.Element {
                 isHover: false,
               })
             }
-            onMouseMove={(): void =>
+            onMouseEnter={(): void =>
               dispatch({
                 type: 'UPDATE_HOVER',
                 category,

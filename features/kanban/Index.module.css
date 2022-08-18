@@ -6,12 +6,12 @@
   background: var(--background4);
 }
 
-.connectContent {
+.connect {
   padding: 1em;
   align-self: center;
 }
 
-.content {
+.columns {
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -19,57 +19,4 @@
   gap: 20px;
   overflow: auto;
   text-align: left;
-}
-
-.content > div {
-  min-width: 250px;
-  max-width: 350px;
-}
-
-.content h2 {
-  font-size: 1em;
-  font-weight: 500;
-}
-
-.content button {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.todo {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.todo button:hover {
-  transform: scale(1.1);
-}
-
-.items {
-  display: flex;
-  flex-direction: column;
-  min-height: 90%;
-  margin: 10px 0;
-  gap: 10px;
-  overflow: auto;
-}
-
-.items h2 {
-  font-size: 0.8em;
-  font-weight: normal;
-  width: 80%;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.items > div {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border-radius: 8px;
-  box-shadow: rgb(27 31 35 / 4%) 0px 1px 0px,
-    rgb(255 255 255 / 25%) 0px 1px 0px inset;
 }
