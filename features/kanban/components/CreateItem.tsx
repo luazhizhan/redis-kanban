@@ -42,9 +42,10 @@ export default function CreateItem(props: Props): JSX.Element {
     <>
       {show && (
         <div className={styles.container}>
-          <span>Title</span>
           <input
             type="text"
+            placeholder="Type a name"
+            autoFocus={true}
             onKeyUp={async (e) => {
               if (e.code === 'Enter') {
                 e.preventDefault()

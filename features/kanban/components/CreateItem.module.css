@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   background: var(--background1);
   height: fit-content;
   padding: 8px;
@@ -23,7 +23,7 @@
 
 .container button {
   font-size: 0.8em;
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 5px;
 }
 .container button:first-child {
@@ -35,6 +35,7 @@
   background: #2b93f5;
   color: white;
   margin-right: 10px;
+  font-weight: 500;
 }
 .container button:nth-child(2) {
   background: #6f6f6f;
@@ -43,4 +44,5 @@
 .container button:nth-child(2):hover {
   background: #5c5c5c;
   color: white;
+  font-weight: 500;
 }

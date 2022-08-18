@@ -16,9 +16,20 @@ export type Action =
       category: Category
       isDragOver: boolean
     }
+  | {
+      type: 'UPDATE_HOVER'
+      id: string
+      category: Category
+      isHover: boolean
+    }
   | { type: 'DELETE'; id: string; category: Category }
 
-export type Item = { id: string; content: string; isDragOver: boolean }
+export type Item = {
+  id: string
+  content: string
+  isDragOver: boolean
+  isHover: boolean
+}
 export type State = { [key in Category]: Item[] }
 
 export const initialState: State = {
@@ -36,17 +47,26 @@ export function reducer(state: State, action: Action): State {
             case 'todo':
               return {
                 ...prev,
-                todo: [...prev.todo, { id, content, isDragOver: false }],
+                todo: [
+                  ...prev.todo,
+                  { id, content, isDragOver: false, isHover: false },
+                ],
               }
             case 'doing':
               return {
                 ...prev,
-                doing: [...prev.doing, { id, content, isDragOver: false }],
+                doing: [
+                  ...prev.doing,
+                  { id, content, isDragOver: false, isHover: false },
+                ],
               }
             case 'done':
               return {
                 ...prev,
-                done: [...prev.done, { id, content, isDragOver: false }],
+                done: [
+                  ...prev.done,
+                  { id, content, isDragOver: false, isHover: false },
+                ],
               }
           }
         },
@@ -80,7 +100,12 @@ export function reducer(state: State, action: Action): State {
       return {
         ...state,
         todo: [
-          { id: action.id, content: action.content, isDragOver: false },
+          {
+            id: action.id,
+            content: action.content,
+            isDragOver: false,
+            isHover: false,
+          },
           ...state.todo,
         ],
       }
@@ -108,6 +133,18 @@ export function reducer(state: State, action: Action): State {
       const updated = state[action.category].map((item) => {
         if (item.id === action.id) {
           return { ...item, isDragOver: action.isDragOver }
+        }
+        return item
+      })
+      return {
+        ...state,
+        [action.category]: updated,
+      }
+    }
+    case 'UPDATE_HOVER': {
+      const updated = state[action.category].map((item) => {
+        if (item.id === action.id) {
+          return { ...item, isHover: action.isHover }
         }
         return item
       })

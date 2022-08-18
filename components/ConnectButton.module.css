@@ -9,6 +9,7 @@
 }
 .connect:hover {
   border: 1px solid #2792f7;
+  font-weight: 500;
 }
 .connect:disabled {
   background: var(--backgound-disabled);
