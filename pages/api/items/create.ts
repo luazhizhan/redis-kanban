@@ -1,8 +1,8 @@
 import * as JD from 'decoders'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import * as jwt from '../libs/jwt'
-import ItemRepository from '../repositories/Item'
-import ItemOrderRepository from '../repositories/ItemOrder'
+import * as jwt from '../../../libs/api/jwt'
+import ItemRepository from '../../../libs/api/repositories/Item'
+import ItemOrderRepository from '../../../libs/api/repositories/ItemOrder'
 
 const BodyDecoder = JD.object({
   title: JD.string,

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import * as jwt from './libs/jwt'
+import * as jwt from '../../libs/api/jwt'
 
 type Error = {
   status: 'error'

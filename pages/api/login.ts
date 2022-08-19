@@ -1,7 +1,7 @@
 import * as JD from 'decoders'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Web3 from 'web3'
-import * as jwt from './libs/jwt'
+import * as jwt from '../../libs/api/jwt'
 
 const BodyDecoder = JD.object({
   address: JD.string,

@@ -14,15 +14,16 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 
   if (!hasMounted) return <></>
 
+  const content =
+    'Kanban board build with Next.js, TypeScript and Redis for Redis Hackathon hosted at DEV Community.'
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
-        <meta
-          name="description"
-          content="Kanban board build with Next.js, TypeScript and Redis for Redis Hackathon hosted at DEV Community."
-        />
+        <meta name="og:title" content="Redis Kanban" />
+        <meta name="description" content={content} />
+        <meta property="og:description" content={content} />
       </Head>
       <Provider>
         <Component {...pageProps} />

@@ -1,5 +1,5 @@
 import { Entity, Repository, Schema } from 'redis-om'
-import Client from '../libs/client'
+import Client from '../client'
 
 interface ItemOrder {
   address: string
