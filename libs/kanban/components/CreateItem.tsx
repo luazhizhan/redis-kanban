@@ -5,13 +5,13 @@ import { Action } from '../store'
 import styles from './CreateItem.module.css'
 
 type Props = {
-  setShow: Dispatch<SetStateAction<boolean>>
+  setHide: Dispatch<SetStateAction<boolean>>
   dispatch: Dispatch<Action>
   category: Category
 }
 
 export default function CreateItem(props: Props): JSX.Element {
-  const { setShow, dispatch, category } = props
+  const { setHide, dispatch, category } = props
   const [createItemInput, setCreateItemInput] = useState('')
   const { wallet } = useWallet()
   const { createItem } = useApi()
@@ -36,7 +36,7 @@ export default function CreateItem(props: Props): JSX.Element {
         category,
       })
       setCreateItemInput('')
-      setShow(false)
+      setHide(true)
     } catch (error) {
       if (error instanceof Error) alert(error.message)
     }
@@ -60,7 +60,7 @@ export default function CreateItem(props: Props): JSX.Element {
       />
       <div>
         <button onClick={onCreateItem}>Add</button>
-        <button onClick={() => setShow(false)}>Cancel</button>
+        <button onClick={() => setHide(true)}>Cancel</button>
       </div>
     </div>
   )

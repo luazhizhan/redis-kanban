@@ -1,16 +1,17 @@
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
-import useHideOutsideClick from '../hooks/useHideOutsideClick'
-import useTheme from '../hooks/useTheme'
-import useWallet from '../hooks/useWallet'
-import ConnectButton from './ConnectButton'
-import styles from './Layout.module.css'
-import DotsVerticalIcon from './svgs/DotsVertical'
-import ExternalLinkIcon from './svgs/ExternalLink'
-import GithubIcon from './svgs/Github'
-import DarkIcon from './svgs/Moon'
-import LightIcon from './svgs/Sun'
-import WalletIcon from './svgs/Wallet'
+import useHideOutsideClick from '../../hooks/useHideOutsideClick'
+import useTheme from '../../hooks/useTheme'
+import useWallet from '../../hooks/useWallet'
+import ConnectButton from '../ConnectButton'
+import DotsVerticalIcon from '../svgs/DotsVertical'
+import ExternalLinkIcon from '../svgs/ExternalLink'
+import GithubIcon from '../svgs/Github'
+import DarkIcon from '../svgs/Moon'
+import LightIcon from '../svgs/Sun'
+import WalletIcon from '../svgs/Wallet'
+import AccountModal from './AccountModal'
+import styles from './Index.module.css'
 
 type Props = {
   children: JSX.Element
@@ -18,8 +19,9 @@ type Props = {
 
 const Layout = (props: Props): JSX.Element => {
   const { children } = props
-  const { wallet, onDisconnect, refreshSession } = useWallet()
+  const { wallet, refreshSession } = useWallet()
   const [hideOptions, setHideOptions] = useState(true)
+  const [hideAccountModal, setHideAccountModal] = useState(true)
   const [isDarkTheme, onChangeTheme] = useTheme()
 
   const optionsRef = useRef<HTMLDivElement>(null)
@@ -59,9 +61,14 @@ const Layout = (props: Props): JSX.Element => {
                   width={20}
                   fill={isDarkTheme ? 'white' : 'black'}
                 />
-                <button onClick={onDisconnect}>
+                <button onClick={() => setHideAccountModal(false)}>
                   <span>{getDisplayAddress(wallet.account)}</span>
                 </button>
+                <AccountModal
+                  hide={hideAccountModal}
+                  setHide={setHideAccountModal}
+                  account={getDisplayAddress(wallet.account)}
+                />
               </div>
             ) : (
               <ConnectButton />

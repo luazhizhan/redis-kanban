@@ -27,26 +27,30 @@ export default function EditModal(props: Props): JSX.Element {
   return (
     <div className={editModalStyle}>
       <div className={styles.content}>
-        <button
-          onClick={async () => {
-            if (!state.edit) return
-            const { item, category, position } = state.edit
-            dispatch({ type: 'SET_EDIT', edit: null })
-            await updateItem(
-              item.id,
-              item.title,
-              item.content,
-              category,
-              position
-            )
-          }}
-        >
-          <CloseIcon
-            height={20}
-            width={20}
-            stroke={isDarkTheme ? 'white' : 'black'}
-          />
-        </button>
+        <div className={styles.header}>
+          <span>Edit</span>
+          <button
+            onClick={async () => {
+              if (!state.edit) return
+              const { item, category, position } = state.edit
+              dispatch({ type: 'SET_EDIT', edit: null })
+              await updateItem(
+                item.id,
+                item.title,
+                item.content,
+                category,
+                position
+              )
+            }}
+          >
+            <CloseIcon
+              height={22}
+              width={22}
+              stroke={isDarkTheme ? 'white' : 'black'}
+            />
+          </button>
+        </div>
+
         <textarea
           className={styles.title}
           placeholder="Untitled"
@@ -62,7 +66,7 @@ export default function EditModal(props: Props): JSX.Element {
           rows={2}
         ></textarea>
         <MDEditor
-          height="80%"
+          height="85%"
           value={state.edit ? state.edit.item.content : ''}
           onChange={(v): void => {
             if (!state.edit) return

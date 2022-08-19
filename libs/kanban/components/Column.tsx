@@ -15,7 +15,7 @@ type Props = {
 export function Column(props: Props): JSX.Element {
   const { useKanbanReducer, category } = props
   const [state, dispatch] = useKanbanReducer
-  const [showCreateItem, setShowCreateItem] = useState(false)
+  const [hideCreateItem, setHideCreateItem] = useState(true)
   const [isDarkTheme] = useTheme()
   const { updateItem } = useApi()
 
@@ -67,7 +67,7 @@ export function Column(props: Props): JSX.Element {
           </h2>
           <span>{state[category].length}</span>
         </span>
-        <button className={styles.add} onClick={() => setShowCreateItem(true)}>
+        <button className={styles.add} onClick={() => setHideCreateItem(false)}>
           <AddIcon
             height={17}
             width={17}
@@ -75,9 +75,9 @@ export function Column(props: Props): JSX.Element {
           />
         </button>
       </div>
-      {showCreateItem && (
+      {!hideCreateItem && (
         <CreateItem
-          setShow={setShowCreateItem}
+          setHide={setHideCreateItem}
           dispatch={dispatch}
           category={category}
         />

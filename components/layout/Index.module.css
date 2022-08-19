@@ -29,7 +29,7 @@
 
 .nav > div {
   display: flex;
-  gap: 10px;
+  gap: 5px;
 }
 
 .menu {
@@ -97,7 +97,7 @@
   gap: 3px;
 }
 
-.connected button {
+.connected > button {
   background: var(--background3);
   color: var(--text1);
   cursor: pointer;
@@ -108,8 +108,12 @@
   border: 1px solid transparent;
 }
 
-.connected button:hover {
+.connected > button:hover {
   border: 1px solid rgb(205, 205, 205);
+}
+
+.connected > button > span {
+  font-weight: 500;
 }
 
 .content {
