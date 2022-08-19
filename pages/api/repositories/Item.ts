@@ -3,6 +3,7 @@ import Client from '../libs/client'
 
 interface Item {
   address: string
+  title: string
   content: string
   category: string
   createdAt: Date
@@ -13,6 +14,7 @@ class Item extends Entity {}
 
 const itemSchema = new Schema(Item, {
   address: { type: 'string' },
+  title: { type: 'text' },
   content: { type: 'text' },
   category: { type: 'string' },
   createdAt: { type: 'date' },

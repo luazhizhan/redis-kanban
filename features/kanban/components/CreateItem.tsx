@@ -31,7 +31,7 @@ export default function CreateItem(props: Props): JSX.Element {
       if (id === null) return
       dispatch({
         type: 'CREATE',
-        content: createItemInput,
+        title: createItemInput,
         id,
         category,
       })

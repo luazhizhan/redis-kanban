@@ -37,6 +37,7 @@ export function Column(props: Props): JSX.Element {
       })
       await updateItem(
         decodedItem.id,
+        decodedItem.title,
         decodedItem.content,
         newCategory,
         position

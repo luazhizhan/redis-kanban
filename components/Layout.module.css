@@ -53,6 +53,7 @@
   width: 200px;
   background: var(--background1);
   border-radius: 8px;
+  z-index: var(--dropdown-index);
 }
 
 .options a {

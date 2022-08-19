@@ -1,4 +1,11 @@
-[data-theme='light'] {
+:root {
+  /* z-indexes */
+  --behind-index: -1;
+  --dropdown-index: 100;
+  --modal-index: 1000;
+}
+
+[data-color-mode='light'] {
   --text1: #000;
   --text-disabled: #666666;
   --background1: #fff;
@@ -11,7 +18,7 @@
   --hover1: #eaeaea;
 }
 
-[data-theme='dark'] {
+[data-color-mode='dark'] {
   --text1: #fff;
   --text-disabled: #b9b9b9;
   --background1: #000;

@@ -12,9 +12,10 @@ type Success = {
   status: 'success'
   data: {
     items: {
-      content: string
+      title: string
       id: string
       category: string
+      content: string
     }[]
     orders: Record<string, string[]>
   }
@@ -42,9 +43,10 @@ export default async function handler(
     .equals(decoded.address)
     .return.all()
 
-  const items = itemQuery.map(({ entityId, category, content }) => ({
+  const items = itemQuery.map(({ entityId, category, title, content }) => ({
     id: entityId,
     category,
+    title,
     content,
   }))
   const itemOrderRepository = await ItemOrderRepository()

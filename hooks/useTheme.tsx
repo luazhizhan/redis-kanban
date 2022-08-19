@@ -11,13 +11,13 @@ export default function useTheme(): ThemeHook {
 
   const setDark = useCallback((): void => {
     localStorage.setItem('theme', 'dark')
-    document.documentElement.setAttribute('data-theme', 'dark')
+    document.documentElement.setAttribute('data-color-mode', 'dark')
     dispatch({ type: 'SET_THEME', theme: 'dark' })
   }, [dispatch])
 
   const setLight = useCallback((): void => {
     localStorage.setItem('theme', 'light')
-    document.documentElement.setAttribute('data-theme', 'light')
+    document.documentElement.setAttribute('data-color-mode', 'light')
     dispatch({ type: 'SET_THEME', theme: 'light' })
   }, [dispatch])
 

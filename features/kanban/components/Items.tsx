@@ -19,7 +19,7 @@ export default function Items(props: Props): JSX.Element {
 
   return (
     <>
-      {state[category].map(({ id, content, isDragOver, isHover }) => {
+      {state[category].map(({ id, title, content, isDragOver, isHover }) => {
         const menuStyles = isHover
           ? `${styles.menu} ${styles.show}`
           : `${styles.menu} ${styles.hide}`
@@ -28,6 +28,17 @@ export default function Items(props: Props): JSX.Element {
           <div
             key={id}
             draggable={true}
+            onClick={() => {
+              const position = state[category].findIndex((i) => i.id === id)
+              dispatch({
+                type: 'SET_EDIT',
+                edit: {
+                  item: { id, title, content, isDragOver, isHover },
+                  category,
+                  position,
+                },
+              })
+            }}
             onTouchStart={(): void =>
               dispatch({
                 type: 'UPDATE_HOVER',
@@ -63,7 +74,7 @@ export default function Items(props: Props): JSX.Element {
             onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
               e.dataTransfer.setData(
                 'text/plain',
-                JSON.stringify({ id, content, category, isDragOver })
+                JSON.stringify({ id, title, content, category, isDragOver })
               )
             }}
             onDragOver={(e: React.DragEvent<HTMLDivElement>) => {
@@ -106,6 +117,7 @@ export default function Items(props: Props): JSX.Element {
                 })
                 await updateItem(
                   decodedItem.id,
+                  decodedItem.title,
                   decodedItem.content,
                   category,
                   position
@@ -118,9 +130,10 @@ export default function Items(props: Props): JSX.Element {
             <div
               className={`${styles.content} ${isDragOver ? styles.dashed : ''}`}
             >
-              <h2>{content}</h2>
+              <h2>{title || 'Untitled'}</h2>
               <button
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation()
                   try {
                     dispatch({ type: 'DELETE', category, id })
                     await deleteItem(id)

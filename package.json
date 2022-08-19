@@ -13,6 +13,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@uiw/react-md-editor": "^3.17.2",
     "decoders": "^2.0.1",
     "jsonwebtoken": "^8.5.1",
     "next": "12.2.4",
@@ -36,6 +37,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "next-remove-imports": "^1.0.6",
     "prettier": "^2.7.1",
     "typescript": "4.7.4"
   }

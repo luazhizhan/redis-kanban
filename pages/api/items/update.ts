@@ -7,6 +7,7 @@ import ItemOrderRepository from '../repositories/ItemOrder'
 const BodyDecoder = JD.object({
   id: JD.string,
   category: JD.oneOf(['todo', 'doing', 'done']),
+  title: JD.string,
   content: JD.string,
   position: JD.integer,
 })
@@ -46,10 +47,11 @@ export default async function handler(
 
   const itemRepository = await ItemRepository()
   const item = await itemRepository.fetch(decodedBody.id)
-  const { category: newCategory, content, position } = decodedBody
+  const { category: newCategory, title, content, position } = decodedBody
   const now = new Date()
   const oldCategory = item.category
   item.category = newCategory
+  item.title = title
   item.content = content
   item.updatedAt = now
 
@@ -70,11 +72,11 @@ export default async function handler(
       .json({ status: 'error', message: 'Item order not found' })
   }
 
-  // Get new category order. Create and save one if it doesn't exist
+  // Get new category order. Create one if it doesn't exist
   const newOrder = await (async () => {
     const order = itemOrders.find(({ category }) => category === newCategory)
     if (order) return order
-    return itemOrderRepository.createAndSave({
+    return itemOrderRepository.createEntity({
       address: decoded.address,
       category: newCategory,
       order: [],

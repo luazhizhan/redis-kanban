@@ -9,10 +9,11 @@ type UseApi = {
     signedMessage: string
   ) => Promise<string>
   refresh: (jwt: string) => Promise<string>
-  createItem: (content: string, category: Category) => Promise<string | null>
+  createItem: (title: string, category: Category) => Promise<string | null>
   allItems: () => Promise<AllItems | null>
   updateItem: (
     id: string,
+    title: string,
     content: string,
     category: Category,
     position: number
@@ -23,7 +24,7 @@ type UseApi = {
 export type Category = 'todo' | 'doing' | 'done'
 
 export type AllItems = {
-  items: { id: string; content: string; category: Category }[]
+  items: { id: string; title: string; content: string; category: Category }[]
   orders: Record<string, string[]>
 }
 
@@ -69,7 +70,7 @@ export default function useApi(): UseApi {
   }
 
   const createItem = async (
-    content: string,
+    title: string,
     category: Category
   ): Promise<string | null> => {
     if (state.wallet.status !== 'connected') return null
@@ -81,7 +82,7 @@ export default function useApi(): UseApi {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        content,
+        title,
         category,
       }),
     })
@@ -109,6 +110,7 @@ export default function useApi(): UseApi {
 
   const updateItem = async (
     id: string,
+    title: string,
     content: string,
     category: Category,
     position: number
@@ -123,8 +125,9 @@ export default function useApi(): UseApi {
       },
       body: JSON.stringify({
         id,
-        content,
+        title,
         category,
+        content,
         position,
       }),
     })
@@ -209,6 +212,7 @@ const AllItemsSuccessDecoder = JD.object({
     items: JD.array(
       JD.object({
         id: JD.string,
+        title: JD.string,
         content: JD.string,
         category: JD.oneOf(['todo', 'doing', 'done']),
       })

@@ -2,7 +2,8 @@ import { AllItems, Category } from '../../hooks/useApi'
 
 export type Action =
   | { type: 'SET_ITEMS'; allItems: AllItems }
-  | { type: 'CREATE'; category: Category; content: string; id: string }
+  | { type: 'CREATE'; category: Category; title: string; id: string }
+  | { type: 'UPDATE'; item: Item; category: Category }
   | {
       type: 'UPDATE_CATEGORY'
       newCategory: Category
@@ -22,51 +23,66 @@ export type Action =
       category: Category
       isHover: boolean
     }
+  | { type: 'SET_EDIT'; edit: EditItem }
   | { type: 'DELETE'; id: string; category: Category }
 
 export type Item = {
   id: string
+  title: string
   content: string
   isDragOver: boolean
   isHover: boolean
 }
-export type State = { [key in Category]: Item[] }
+
+type EditItem = {
+  item: Item
+  category: Category
+  position: number
+} | null
+
+type CategoryState = {
+  [key in Category]: Item[]
+}
+
+export interface State extends CategoryState {
+  edit: EditItem
+}
 
 export const initialState: State = {
   todo: [],
   doing: [],
   done: [],
+  edit: null,
 }
+
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_ITEMS': {
       const { allItems } = action
       const items = allItems.items.reduce(
-        (prev, { category, id, content }) => {
+        (prev, { category, id, title, content }) => {
+          const init = {
+            id,
+            title,
+            content,
+            isDragOver: false,
+            isHover: false,
+          }
           switch (category) {
             case 'todo':
               return {
                 ...prev,
-                todo: [
-                  ...prev.todo,
-                  { id, content, isDragOver: false, isHover: false },
-                ],
+                todo: [...prev.todo, init],
               }
             case 'doing':
               return {
                 ...prev,
-                doing: [
-                  ...prev.doing,
-                  { id, content, isDragOver: false, isHover: false },
-                ],
+                doing: [...prev.doing, init],
               }
             case 'done':
               return {
                 ...prev,
-                done: [
-                  ...prev.done,
-                  { id, content, isDragOver: false, isHover: false },
-                ],
+                done: [...prev.done, init],
               }
           }
         },
@@ -102,12 +118,23 @@ export function reducer(state: State, action: Action): State {
         [action.category]: [
           {
             id: action.id,
-            content: action.content,
+            title: action.title,
+            content: '',
             isDragOver: false,
             isHover: false,
           },
           ...state[action.category],
         ],
+      }
+    }
+    case 'UPDATE': {
+      if (!state.edit) return state
+      return {
+        ...state,
+        [action.category]: state[action.category].map((item) =>
+          item.id === action.item.id ? action.item : item
+        ),
+        edit: { ...state.edit, item: action.item },
       }
     }
     case 'UPDATE_CATEGORY': {
@@ -151,6 +178,12 @@ export function reducer(state: State, action: Action): State {
       return {
         ...state,
         [action.category]: updated,
+      }
+    }
+    case 'SET_EDIT': {
+      return {
+        ...state,
+        edit: action.edit,
       }
     }
     case 'DELETE': {

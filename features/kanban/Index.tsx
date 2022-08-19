@@ -3,6 +3,7 @@ import ConnectButton from '../../components/ConnectButton'
 import useApi from '../../hooks/useApi'
 import useWallet from '../../hooks/useWallet'
 import { Column } from './components/Column'
+import EditModal from './components/EditModal'
 import styles from './Index.module.css'
 import { initialState, reducer } from './store'
 
@@ -43,6 +44,7 @@ export default function Index(): JSX.Element {
         <Column category="doing" useKanbanReducer={[state, dispatch]} />
         <Column category="done" useKanbanReducer={[state, dispatch]} />
       </section>
+      <EditModal useKanbanReducer={[state, dispatch]} />
     </div>
   )
 }

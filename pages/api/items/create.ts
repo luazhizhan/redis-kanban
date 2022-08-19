@@ -5,7 +5,7 @@ import ItemRepository from '../repositories/Item'
 import ItemOrderRepository from '../repositories/ItemOrder'
 
 const BodyDecoder = JD.object({
-  content: JD.string,
+  title: JD.string,
   category: JD.oneOf(['todo', 'doing', 'done']),
 })
 
@@ -46,6 +46,7 @@ export default async function handler(
   const item = await itemRepository.createAndSave({
     ...decodedBody,
     address: decoded.address,
+    content: '',
     createdAt: now,
     updatedAt: now,
   })
