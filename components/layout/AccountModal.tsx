@@ -26,34 +26,47 @@ export default function AccountModal(props: Props): JSX.Element {
   return (
     <div className={containerStyle}>
       <div className={styles.content} ref={accountModalRef}>
-        <div className={styles.header}>
-          <span>Account</span>
-          <button onClick={() => setHide(true)}>
-            <CloseIcon
-              height={22}
-              width={22}
-              stroke={isDarkTheme ? 'white' : 'black'}
-            />
-          </button>
-        </div>
-        <div className={styles.account}>
-          <div>
-            <WalletIcon
-              height={28}
-              width={28}
-              fill={isDarkTheme ? 'white' : 'black'}
-            />
-            <span>{account}</span>
+        {/* Account Information */}
+        <div className={styles.accountInfo}>
+          {/* Header */}
+          <div className={styles.header}>
+            <span>Account</span>
+            <button onClick={() => setHide(true)}>
+              <CloseIcon
+                height={22}
+                width={22}
+                stroke={isDarkTheme ? 'white' : 'black'}
+              />
+            </button>
           </div>
 
-          <button
-            onClick={() => {
-              onDisconnect()
-              setHide(true)
-            }}
-          >
-            Disconnect
-          </button>
+          {/* Address */}
+          <div className={styles.account}>
+            <div className={styles.address}>
+              <WalletIcon
+                height={24}
+                width={24}
+                fill={isDarkTheme ? 'white' : 'black'}
+              />
+              <span>{account}</span>
+            </div>
+            <div className={styles.connected}>
+              <span>Connected with MetaMask</span>
+              <button
+                onClick={() => {
+                  onDisconnect()
+                  setHide(true)
+                }}
+              >
+                Disconnect
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Deleted cards */}
+        <div className={styles.deleted}>
+          <p>Your deleted cards will appear here...</p>
         </div>
       </div>
     </div>

@@ -20,8 +20,8 @@
 
 .container .content {
   min-width: 300px;
-  width: 85%;
-  height: 85%;
+  width: 95%;
+  height: 90%;
   align-self: center;
   margin: 0 auto;
   background: var(--background-modal);

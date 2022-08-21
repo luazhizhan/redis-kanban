@@ -13,7 +13,7 @@
 }
 .add:hover {
   background: var(--background3);
-  border: 1px solid var(--border2);
+  border: 1px solid var(--border1);
 }
 
 .content {

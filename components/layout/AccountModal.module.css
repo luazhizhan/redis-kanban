@@ -20,28 +20,32 @@
 
 .content {
   width: 90vw;
-  max-width: 450px;
+  max-width: 400px;
   margin: 0 auto;
   background: var(--background-modal);
   border-radius: 15px;
   display: flex;
   flex-direction: column;
   align-self: center;
-  padding: 15px;
   gap: 5px;
+}
+
+.accountInfo {
+  padding: 15px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 5px;
 }
 
 .header button {
   background: none;
   border: none;
   padding: 5px;
-  margin-bottom: 5px;
+  padding-right: 0;
   cursor: pointer;
 }
 
@@ -61,36 +65,55 @@
 .account {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border2);
+  border: 1px solid var(--border1);
   flex-wrap: wrap;
   padding: 10px;
   border-radius: 10px;
   gap: 8px;
 }
 
-.account > div {
+.address {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.account > div > span {
+.address > span {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--text1);
 }
 
-.account > button {
+.connected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.connected > button {
   background: none;
   border: 1px solid #49a1f3;
   color: #2792f7;
-  padding: 5px 10px;
+  padding: 4px 8px;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 400;
 }
 
-.account > button:hover {
+.connected > span {
+  color: var(--text1);
+}
+
+.connected > button:hover {
   border: 1px solid #0084ff;
   font-weight: 500;
+}
+
+.deleted {
+  padding: 20px;
+  background: var(--background3);
+  border-radius: 15px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
