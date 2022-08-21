@@ -144,7 +144,7 @@ export default function AccountModal(props: Props): JSX.Element {
                   <RestoreIcon
                     height={22}
                     width={22}
-                    fill={isDarkTheme ? 'white' : '#484b4d'}
+                    stroke={isDarkTheme ? 'white' : 'black'}
                   />
                 </button>
               </div>
