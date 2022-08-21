@@ -18,6 +18,7 @@ type UseApi = {
     category: Category,
     position: number
   ) => Promise<string | null>
+  deleteItemPermanent: (id: string, category: Category) => Promise<void>
   deleteItem: (id: string, category: Category) => Promise<void>
   deletedItems: (offset: number) => Promise<ApiItem[]>
   restoreItem: (id: string) => Promise<ApiItem | null>
@@ -165,6 +166,28 @@ export default function useApi(): UseApi {
     if (decodedData.status === 'error') throw new Error(decodedData.message)
   }
 
+  const deleteItemPermanent = async (
+    id: string,
+    category: Category
+  ): Promise<void> => {
+    if (state.wallet.status !== 'connected') return
+    const response = await fetch('/api/items/delete-perm', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${state.wallet.jwt}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id,
+        category,
+      }),
+    })
+    const data = await response.json()
+    const decodedData = DeleteItemDecoder.verify(data)
+    if (decodedData.status === 'error') throw new Error(decodedData.message)
+  }
+
   const deletedItems = async (offset: number): Promise<ApiItem[]> => {
     if (state.wallet.status !== 'connected') return []
     const response = await fetch('/api/items/deleted', {
@@ -210,6 +233,7 @@ export default function useApi(): UseApi {
     allItems,
     updateItem,
     deleteItem,
+    deleteItemPermanent,
     deletedItems,
     restoreItem,
   }

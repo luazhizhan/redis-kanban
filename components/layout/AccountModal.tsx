@@ -13,6 +13,7 @@ import useWallet from '../../hooks/useWallet'
 import { Context } from '../../store/Store'
 import CloseIcon from '../svgs/Close'
 import RestoreIcon from '../svgs/Restore'
+import TrashIcon from '../svgs/Trash'
 import WalletIcon from '../svgs/Wallet'
 import styles from './AccountModal.module.css'
 
@@ -26,7 +27,7 @@ export default function AccountModal(props: Props): JSX.Element {
   const { hide, setHide, account } = props
   const [isDarkTheme] = useTheme()
   const { onDisconnect } = useWallet()
-  const { restoreItem, deletedItems } = useApi()
+  const { restoreItem, deletedItems, deleteItemPermanent } = useApi()
   const nextOffset = 5
   const [load, setLoad] = useState({ offset: 0, completed: false })
   const [items, setItems] = useState<ApiItem[]>([])
@@ -136,17 +137,32 @@ export default function AccountModal(props: Props): JSX.Element {
                     {category}
                   </span>
                 </div>
-                <button
-                  onClick={() =>
-                    onRestoreClick({ id, category, content, title })
-                  }
-                >
-                  <RestoreIcon
-                    height={22}
-                    width={22}
-                    stroke={isDarkTheme ? 'white' : 'black'}
-                  />
-                </button>
+                <div>
+                  <button
+                    onClick={async () => {
+                      setItems(items.filter((i) => i.id !== id))
+                      dispatch({ type: 'DELETE', id, category })
+                      await deleteItemPermanent(id, category)
+                    }}
+                  >
+                    <TrashIcon
+                      height={22}
+                      width={22}
+                      stroke={isDarkTheme ? 'white' : 'black'}
+                    />
+                  </button>
+                  <button
+                    onClick={() =>
+                      onRestoreClick({ id, category, content, title })
+                    }
+                  >
+                    <RestoreIcon
+                      height={22}
+                      width={22}
+                      stroke={isDarkTheme ? 'white' : 'black'}
+                    />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

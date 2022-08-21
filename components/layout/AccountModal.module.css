@@ -139,30 +139,36 @@
   background: var(--background2);
 }
 
-.item > div {
+.item > div:first-child {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.item > div > span:first-child {
+.item > div:first-child > span:first-child {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.item > div > span:last-child {
+.item > div:first-child > span:last-child {
   padding: 5px;
   border-radius: 5px;
   width: fit-content;
 }
 
-.item > button {
+.item > div:last-child {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.item > div:last-child > button {
   background: none;
   border: none;
   cursor: pointer;
 }
 
-.item > button:hover {
+.item > div:last-child > button:hover {
   transform: scale(1.1);
 }
 
