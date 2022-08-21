@@ -1,3 +1,7 @@
+.hide {
+  display: none;
+}
+
 .container {
   position: fixed;
   top: 0;
@@ -27,7 +31,6 @@
   display: flex;
   flex-direction: column;
   align-self: center;
-  gap: 5px;
 }
 
 .accountInfo {
@@ -75,20 +78,19 @@
 .address {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .address > span {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--text1);
+  margin-left: 10px;
 }
 
 .connected {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
   font-size: 14px;
 }
 
@@ -108,6 +110,60 @@
 .connected > button:hover {
   border: 1px solid #0084ff;
   font-weight: 500;
+}
+
+.items > span {
+  padding: 0px 20px;
+  font-weight: 500;
+}
+
+.items > div {
+  margin-top: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.item:last-child {
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.item:hover {
+  background: var(--background2);
+}
+
+.item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item > div > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item > div > span:last-child {
+  padding: 5px;
+  border-radius: 5px;
+  width: fit-content;
+}
+
+.item > button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.item > button:hover {
+  transform: scale(1.1);
 }
 
 .deleted {

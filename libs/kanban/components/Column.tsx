@@ -1,20 +1,20 @@
-import { Dispatch, useState } from 'react'
+import { useContext, useState } from 'react'
 import AddIcon from '../../../components/svgs/Add'
 import useApi, { Category } from '../../../hooks/useApi'
 import useTheme from '../../../hooks/useTheme'
+import { Context } from '../../../store/Store'
 import { ItemDecoder } from '../helper'
-import { Action, State } from '../store'
 import styles from './Column.module.css'
 import CreateItem from './CreateItem'
 import Items from './Items'
 
 type Props = {
   category: Category
-  useKanbanReducer: [State, Dispatch<Action>]
 }
 export function Column(props: Props): JSX.Element {
-  const { useKanbanReducer, category } = props
-  const [state, dispatch] = useKanbanReducer
+  const { category } = props
+  const { state, dispatch } = useContext(Context)
+
   const [hideCreateItem, setHideCreateItem] = useState(true)
   const [isDarkTheme] = useTheme()
   const { updateItem } = useApi()
@@ -26,7 +26,7 @@ export function Column(props: Props): JSX.Element {
     const item = e.dataTransfer.getData('text/plain')
     const parsedItem = JSON.parse(item)
     const decodedItem = ItemDecoder.verify(parsedItem)
-    const position = state[newCategory].length
+    const position = state.kanban[newCategory].length
     try {
       dispatch({
         type: 'UPDATE_CATEGORY',
@@ -65,7 +65,7 @@ export function Column(props: Props): JSX.Element {
           <h2 className={styles.header} style={{ background: headerStyle }}>
             {category}
           </h2>
-          <span>{state[category].length}</span>
+          <span>{state.kanban[category].length}</span>
         </span>
         <button className={styles.add} onClick={() => setHideCreateItem(false)}>
           <AddIcon
@@ -76,18 +76,14 @@ export function Column(props: Props): JSX.Element {
         </button>
       </div>
       {!hideCreateItem && (
-        <CreateItem
-          setHide={setHideCreateItem}
-          dispatch={dispatch}
-          category={category}
-        />
+        <CreateItem setHide={setHideCreateItem} category={category} />
       )}
       <div
         className={styles.items}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => onItemDrop(e, category)}
       >
-        <Items category={category} useKanbanReducer={[state, dispatch]} />
+        <Items category={category} />
       </div>
     </div>
   )

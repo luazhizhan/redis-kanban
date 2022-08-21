@@ -35,6 +35,7 @@
 .menu {
   display: flex;
   padding: 3px 5px;
+  padding-right: 5.5px;
   border: 1px solid var(--border1);
   border-radius: 5px;
   cursor: pointer;

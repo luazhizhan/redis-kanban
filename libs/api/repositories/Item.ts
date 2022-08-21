@@ -6,6 +6,7 @@ interface Item {
   title: string
   content: string
   category: string
+  deleted: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -17,8 +18,9 @@ const itemSchema = new Schema(Item, {
   title: { type: 'text' },
   content: { type: 'text' },
   category: { type: 'string' },
+  deleted: { type: 'boolean' },
   createdAt: { type: 'date' },
-  updatedAt: { type: 'date' },
+  updatedAt: { type: 'date', sortable: true },
 })
 
 export default async function repository(): Promise<Repository<Item>> {

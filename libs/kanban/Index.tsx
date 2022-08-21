@@ -1,14 +1,14 @@
-import { useEffect, useReducer } from 'react'
+import { useContext, useEffect } from 'react'
 import ConnectButton from '../../components/ConnectButton'
 import useApi from '../../hooks/useApi'
 import useWallet from '../../hooks/useWallet'
+import { Context } from '../../store/Store'
 import { Column } from './components/Column'
 import EditModal from './components/EditModal'
 import styles from './Index.module.css'
-import { initialState, reducer } from './store'
 
 export default function Index(): JSX.Element {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const { dispatch } = useContext(Context)
   const { wallet } = useWallet()
   const { allItems } = useApi()
 
@@ -40,11 +40,11 @@ export default function Index(): JSX.Element {
   return (
     <div className={styles.container}>
       <section className={styles.columns}>
-        <Column category="todo" useKanbanReducer={[state, dispatch]} />
-        <Column category="doing" useKanbanReducer={[state, dispatch]} />
-        <Column category="done" useKanbanReducer={[state, dispatch]} />
+        <Column category="todo" />
+        <Column category="doing" />
+        <Column category="done" />
       </section>
-      <EditModal useKanbanReducer={[state, dispatch]} />
+      <EditModal />
     </div>
   )
 }

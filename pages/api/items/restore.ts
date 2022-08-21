@@ -6,7 +6,6 @@ import ItemOrderRepository from '../../../libs/api/repositories/ItemOrder'
 
 const BodyDecoder = JD.object({
   id: JD.string,
-  category: JD.oneOf(['todo', 'doing', 'done']),
 })
 
 type Error = {
@@ -16,6 +15,14 @@ type Error = {
 
 type Success = {
   status: 'success'
+  data: {
+    item: {
+      title: string
+      id: string
+      category: string
+      content: string
+    }
+  }
 }
 
 type Result = Error | Success
@@ -39,24 +46,34 @@ export default async function handler(
 
   const itemRepository = await ItemRepository()
   const item = await itemRepository.fetch(decodedBody.id)
-  item.deleted = true
+  item.deleted = false
   item.updatedAt = new Date()
   await itemRepository.save(item)
 
-  // Update item orders
+  // Update item order
   const itemOrderRepository = await ItemOrderRepository()
   const itemOrder = await itemOrderRepository
     .search()
     .where('address')
     .equals(decoded.address)
     .and('category')
-    .equals(decodedBody.category)
+    .equals(item.category)
     .return.first()
 
   if (itemOrder) {
-    itemOrder.order = itemOrder.order.filter((id) => id !== decodedBody.id)
+    itemOrder.order = [item.entityId, ...itemOrder.order]
     await itemOrderRepository.save(itemOrder)
   }
 
-  return res.status(200).json({ status: 'success' })
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      item: {
+        title: item.title,
+        id: item.entityId,
+        category: item.category,
+        content: item.content,
+      },
+    },
+  })
 }

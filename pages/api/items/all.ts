@@ -41,6 +41,8 @@ export default async function handler(
     .search()
     .where('address')
     .equals(decoded.address)
+    .and('deleted')
+    .equals(false)
     .return.all()
 
   const items = itemQuery.map(({ entityId, category, title, content }) => ({

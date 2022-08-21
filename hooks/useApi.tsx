@@ -18,13 +18,22 @@ type UseApi = {
     category: Category,
     position: number
   ) => Promise<string | null>
-  deleteItem: (id: string) => Promise<void>
+  deleteItem: (id: string, category: Category) => Promise<void>
+  deletedItems: (offset: number) => Promise<ApiItem[]>
+  restoreItem: (id: string) => Promise<ApiItem | null>
 }
 
 export type Category = 'todo' | 'doing' | 'done'
 
+export type ApiItem = {
+  id: string
+  title: string
+  content: string
+  category: Category
+}
+
 export type AllItems = {
-  items: { id: string; title: string; content: string; category: Category }[]
+  items: ApiItem[]
   orders: Record<string, string[]>
 }
 
@@ -137,9 +146,47 @@ export default function useApi(): UseApi {
     return decodedData.data.id
   }
 
-  const deleteItem = async (id: string): Promise<void> => {
+  const deleteItem = async (id: string, category: Category): Promise<void> => {
     if (state.wallet.status !== 'connected') return
     const response = await fetch('/api/items/delete', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${state.wallet.jwt}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id,
+        category,
+      }),
+    })
+    const data = await response.json()
+    const decodedData = DeleteItemDecoder.verify(data)
+    if (decodedData.status === 'error') throw new Error(decodedData.message)
+  }
+
+  const deletedItems = async (offset: number): Promise<ApiItem[]> => {
+    if (state.wallet.status !== 'connected') return []
+    const response = await fetch('/api/items/deleted', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${state.wallet.jwt}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        offset,
+      }),
+    })
+    const data = await response.json()
+    const decodedData = DeletedItemsDecoder.verify(data)
+    if (decodedData.status === 'error') throw new Error(decodedData.message)
+    return decodedData.data.items
+  }
+
+  const restoreItem = async (id: string): Promise<ApiItem | null> => {
+    if (state.wallet.status !== 'connected') return null
+    const response = await fetch('/api/items/restore', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${state.wallet.jwt}`,
@@ -151,11 +198,21 @@ export default function useApi(): UseApi {
       }),
     })
     const data = await response.json()
-    const decodedData = DeleteItemDecoder.verify(data)
+    const decodedData = RestoreItemDecoder.verify(data)
     if (decodedData.status === 'error') throw new Error(decodedData.message)
+    return decodedData.data.item
   }
 
-  return { login, refresh, createItem, allItems, updateItem, deleteItem }
+  return {
+    login,
+    refresh,
+    createItem,
+    allItems,
+    updateItem,
+    deleteItem,
+    deletedItems,
+    restoreItem,
+  }
 }
 
 /* Decoders */
@@ -258,4 +315,59 @@ const DeleteItemSuccessDecoder = JD.object({
 const DeleteItemDecoder = JD.either(
   DeleteItemErrorDecoder,
   DeleteItemSuccessDecoder
+)
+
+// Deleted Items API
+const DeletedItemsErrorDecoder = JD.object({
+  status: JD.constant('error'),
+  message: JD.oneOf([
+    'Invalid body',
+    'Unauthorised',
+    'Invalid JWT',
+    'Expired JWT',
+  ]),
+})
+const DeletedItemsSuccessDecoder = JD.object({
+  status: JD.constant('success'),
+  data: JD.object({
+    items: JD.array(
+      JD.object({
+        id: JD.string,
+        title: JD.string,
+        content: JD.string,
+        category: JD.oneOf(['todo', 'doing', 'done']),
+      })
+    ),
+  }),
+})
+
+const DeletedItemsDecoder = JD.either(
+  DeletedItemsErrorDecoder,
+  DeletedItemsSuccessDecoder
+)
+
+// Restore Item API
+const RestoreItemErrorDecoder = JD.object({
+  status: JD.constant('error'),
+  message: JD.oneOf([
+    'Invalid body',
+    'Unauthorised',
+    'Invalid JWT',
+    'Expired JWT',
+  ]),
+})
+const RestoreItemSuccessDecoder = JD.object({
+  status: JD.constant('success'),
+  data: JD.object({
+    item: JD.object({
+      id: JD.string,
+      title: JD.string,
+      content: JD.string,
+      category: JD.oneOf(['todo', 'doing', 'done']),
+    }),
+  }),
+})
+const RestoreItemDecoder = JD.either(
+  RestoreItemErrorDecoder,
+  RestoreItemSuccessDecoder
 )

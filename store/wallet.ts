@@ -1,3 +1,7 @@
+export type Action = {
+  type: 'SET_WALLET'
+  wallet: Wallet
+}
 type Connecting = {
   status: 'connecting'
 }

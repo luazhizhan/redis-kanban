@@ -1,17 +1,24 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react'
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+} from 'react'
 import useApi, { Category } from '../../../hooks/useApi'
 import useWallet from '../../../hooks/useWallet'
-import { Action } from '../store'
+import { Context } from '../../../store/Store'
 import styles from './CreateItem.module.css'
 
 type Props = {
   setHide: Dispatch<SetStateAction<boolean>>
-  dispatch: Dispatch<Action>
   category: Category
 }
 
 export default function CreateItem(props: Props): JSX.Element {
-  const { setHide, dispatch, category } = props
+  const { setHide, category } = props
+  const { dispatch } = useContext(Context)
+
   const [createItemInput, setCreateItemInput] = useState('')
   const { wallet } = useWallet()
   const { createItem } = useApi()

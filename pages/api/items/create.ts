@@ -47,6 +47,7 @@ export default async function handler(
     ...decodedBody,
     address: decoded.address,
     content: '',
+    deleted: false,
     createdAt: now,
     updatedAt: now,
   })

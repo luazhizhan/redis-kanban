@@ -1,26 +1,22 @@
 import '@uiw/react-markdown-preview/markdown.css'
 import '@uiw/react-md-editor/markdown-editor.css'
 import dynamic from 'next/dynamic'
-import { Dispatch } from 'react'
+import { useContext } from 'react'
 import CloseIcon from '../../../components/svgs/Close'
 import useApi from '../../../hooks/useApi'
 import useTheme from '../../../hooks/useTheme'
-import { Action, State } from '../store'
+import { Context } from '../../../store/Store'
 import styles from './EditModal.module.css'
-
-type Props = {
-  useKanbanReducer: [State, Dispatch<Action>]
-}
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false })
 
-export default function EditModal(props: Props): JSX.Element {
-  const { useKanbanReducer } = props
-  const [state, dispatch] = useKanbanReducer
+export default function EditModal(): JSX.Element {
+  const { state, dispatch } = useContext(Context)
+
   const [isDarkTheme] = useTheme()
   const { updateItem } = useApi()
 
-  const editModalStyle = state.edit
+  const editModalStyle = state.kanban.edit
     ? `${styles.container} ${styles.show}`
     : `${styles.container} ${styles.hide}`
 
@@ -31,8 +27,8 @@ export default function EditModal(props: Props): JSX.Element {
           <span>Edit</span>
           <button
             onClick={async () => {
-              if (!state.edit) return
-              const { item, category, position } = state.edit
+              if (!state.kanban.edit) return
+              const { item, category, position } = state.kanban.edit
               dispatch({ type: 'SET_EDIT', edit: null })
               await updateItem(
                 item.id,
@@ -54,26 +50,26 @@ export default function EditModal(props: Props): JSX.Element {
         <textarea
           className={styles.title}
           placeholder="Untitled"
-          value={state.edit ? state.edit.item.title : ''}
+          value={state.kanban.edit ? state.kanban.edit.item.title : ''}
           onChange={(e): void => {
-            if (!state.edit) return
+            if (!state.kanban.edit) return
             dispatch({
               type: 'UPDATE',
-              item: { ...state.edit.item, title: e.currentTarget.value },
-              category: state.edit.category,
+              item: { ...state.kanban.edit.item, title: e.currentTarget.value },
+              category: state.kanban.edit.category,
             })
           }}
           rows={2}
         ></textarea>
         <MDEditor
           height="85%"
-          value={state.edit ? state.edit.item.content : ''}
+          value={state.kanban.edit ? state.kanban.edit.item.content : ''}
           onChange={(v): void => {
-            if (!state.edit) return
+            if (!state.kanban.edit) return
             dispatch({
               type: 'UPDATE',
-              item: { ...state.edit.item, content: v || '' },
-              category: state.edit.category,
+              item: { ...state.kanban.edit.item, content: v || '' },
+              category: state.kanban.edit.category,
             })
           }}
         />
