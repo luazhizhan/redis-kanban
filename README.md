@@ -2,9 +2,9 @@
 
 Kanban board build with Next.js, TypeScript and Redis
 
-<img src="https://user-images.githubusercontent.com/16435270/185055969-522e034d-b62e-424b-8acd-a943186cf23e.png" width="250" height="500" />
-<img src="https://user-images.githubusercontent.com/16435270/185056735-6ff8016c-2f23-4790-b1cb-9bde046f169e.png" width="700" height="400" />
-<img src="https://user-images.githubusercontent.com/16435270/185056859-92d02b22-978a-4079-8708-7e9622d9b805.png" width="700" height="400" />
+<img src="https://user-images.githubusercontent.com/16435270/186055292-e13451c1-0b08-4d42-af2d-682ecd7279e4.png" width="1000" height="500" />
+<img src="https://user-images.githubusercontent.com/16435270/186055303-c5d48a6b-efcb-4dea-9a0b-9eee64cce8c9.png" width="1000" height="500" />
+<img src="https://user-images.githubusercontent.com/16435270/186055329-4769dec7-dc80-4089-8960-592e3fe9bb04.png" width="1000" height="400" />
 
 ## How it works
 
@@ -14,11 +14,15 @@ All persistant data are stored into Redis using [redis-om-node](https://github.c
 
 #### Kanban Item
 
+Kanban item data are stored in Redis as JSON.
+
 ```ts
 interface Item {
   address: string
+  title: string
   content: string
   category: string
+  deleted: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -27,16 +31,25 @@ class Item extends Entity {}
 
 const itemSchema = new Schema(Item, {
   address: { type: 'string' },
+  title: { type: 'text' },
   content: { type: 'text' },
   category: { type: 'string' },
+  deleted: { type: 'boolean' },
   createdAt: { type: 'date' },
-  updatedAt: { type: 'date' },
+  updatedAt: { type: 'date', sortable: true },
 })
+
+export default async function repository(): Promise<Repository<Item>> {
+  const client = await Client()
+  const itemRepository = client.fetchRepository(itemSchema)
+  await itemRepository.createIndex()
+  return itemRepository
+}
 ```
 
 #### Kanban Items Order
 
-This data is stored to maintain the same kanban item ordering as before.
+The positions of the Kanban items are stored in Redis as JSON.
 
 ```ts
 interface ItemOrder {
@@ -52,41 +65,7 @@ const itemOrderSchema = new Schema(ItemOrder, {
   category: { type: 'string' },
   order: { type: 'string[]' },
 })
-```
 
-### How the data is accessed:
-
-All persistant data are access from Redis using [redis-om-node](https://github.com/redis/redis-om-node/) library.
-
-#### Kanban Item
-
-Item Repository
-
-```ts
-export default async function repository(): Promise<Repository<Item>> {
-  const client = await Client()
-  const itemRepository = client.fetchRepository(itemSchema)
-  await itemRepository.createIndex()
-  return itemRepository
-}
-```
-
-Example of retrieving all Kanban items of a user
-
-```ts
-const itemRepository = await ItemRepository()
-const itemQuery = await itemRepository
-  .search()
-  .where('address')
-  .equals(decoded.address)
-  .return.all()
-```
-
-#### Kanban Items Order
-
-Item order Repository
-
-```ts
 export default async function repository(): Promise<Repository<ItemOrder>> {
   const client = await Client()
   const itemOrderRepository = client.fetchRepository(itemOrderSchema)
@@ -95,7 +74,60 @@ export default async function repository(): Promise<Repository<ItemOrder>> {
 }
 ```
 
-Example of retrieving Kanban items order of `todo` column belonging a specific user
+### How the data is accessed:
+
+All persistant data are access from Redis using [redis-om-node](https://github.com/redis/redis-om-node/) library.
+
+The data are retrieved and sent as REST API to the frontend via Node.js Serverless Functions by Vercel.
+
+#### All
+
+Retrieve all items and order of the items by wallet address.
+
+All items that are not marked as deleted.
+
+```ts
+const itemRepository = await ItemRepository()
+const itemQuery = await itemRepository
+  .search()
+  .where('address')
+  .equals(decoded.address)
+  .and('deleted')
+  .equals(false)
+  .return.all()
+```
+
+Get Kanban items order
+
+```ts
+const itemOrderRepository = await ItemOrderRepository()
+const itemOrderQuery = await itemOrderRepository
+  .search()
+  .where('address')
+  .equals(decoded.address)
+  .return.all()
+```
+
+#### Create
+
+Store Kanban and the position of the item
+
+Create Kanban item
+
+```ts
+const itemRepository = await ItemRepository()
+const now = new Date()
+const item = await itemRepository.createAndSave({
+  ...decodedBody,
+  address: decoded.address,
+  content: '',
+  deleted: false,
+  createdAt: now,
+  updatedAt: now,
+})
+```
+
+Create position of the Kanban item.
 
 ```ts
 const itemOrderRepository = await ItemOrderRepository()
@@ -104,8 +136,188 @@ const itemOrder = await itemOrderRepository
   .where('address')
   .equals(decoded.address)
   .and('category')
-  .equals('todo')
+  .equals(decodedBody.category)
   .return.first()
+if (itemOrder) {
+  itemOrder.order = [item.entityId, ...itemOrder.order]
+  await itemOrderRepository.save(itemOrder)
+} else {
+  await itemOrderRepository.createAndSave({
+    address: decoded.address,
+    category: decodedBody.category,
+    order: [item.entityId],
+  })
+}
+```
+
+#### Update
+
+Update content and position of the Kanban item
+
+Update by id
+
+```ts
+const itemRepository = await ItemRepository()
+const item = await itemRepository.fetch(decodedBody.id)
+const { category: newCategory, title, content, position } = decodedBody
+const now = new Date()
+const oldCategory = item.category
+item.category = newCategory
+item.title = title
+item.content = content
+item.updatedAt = now
+```
+
+Update position of the Kanban item
+
+```ts
+const itemOrderRepository = await ItemOrderRepository()
+const itemOrders = await itemOrderRepository
+  .search()
+  .where('address')
+  .equals(decoded.address)
+  .return.all()
+
+// Get old category item orders
+const oldOrder = itemOrders.find(({ category }) => category === oldCategory)
+if (!oldOrder) {
+  return res
+    .status(400)
+    .json({ status: 'error', message: 'Item order not found' })
+}
+
+// Get new category order. Create one if it doesn't exist
+const newOrder = await(async () => {
+  const order = itemOrders.find(({ category }) => category === newCategory)
+  if (order) return order
+  return itemOrderRepository.createEntity({
+    address: decoded.address,
+    category: newCategory,
+    order: [],
+  })
+})()
+
+// Remove item id from old order
+oldOrder.order = oldOrder.order.filter((id) => id !== decodedBody.id)
+
+// Determine if old and new order are the same category
+const updatingOrder = newCategory === oldCategory ? oldOrder : newOrder
+
+// Update new order by item id and position
+newOrder.order = [
+  ...updatingOrder.order.slice(0, position),
+  decodedBody.id,
+  ...updatingOrder.order.slice(position),
+]
+```
+
+#### Delete
+
+Mark Kanban item as deleted and remove from Kanban items order array
+
+Mark as deleted
+
+```ts
+const itemRepository = await ItemRepository()
+const item = await itemRepository.fetch(decodedBody.id)
+item.deleted = true
+item.updatedAt = new Date()
+await itemRepository.save(item)
+```
+
+Remove Kanban item from Kanban items order array
+
+```ts
+const itemOrderRepository = await ItemOrderRepository()
+const itemOrder = await itemOrderRepository
+  .search()
+  .where('address')
+  .equals(decoded.address)
+  .and('category')
+  .equals(decodedBody.category)
+  .return.first()
+
+if (itemOrder) {
+  itemOrder.order = itemOrder.order.filter((id) => id !== decodedBody.id)
+  await itemOrderRepository.save(itemOrder)
+}
+```
+
+#### Delete Permanent
+
+Delete Kanban item from Redis
+
+Delete by id
+
+```ts
+const itemRepository = await ItemRepository()
+await itemRepository.remove(decodedBody.id)
+```
+
+Remove Kanban item position data
+
+```ts
+const itemOrderRepository = await ItemOrderRepository()
+const itemOrder = await itemOrderRepository
+  .search()
+  .where('address')
+  .equals(decoded.address)
+  .and('category')
+  .equals(decodedBody.category)
+  .return.first()
+
+if (itemOrder) {
+  itemOrder.order = itemOrder.order.filter((id) => id !== decodedBody.id)
+  await itemOrderRepository.save(itemOrder)
+}
+```
+
+#### Restore
+
+Mark Kanban item as not deleted
+
+Mark as not deleted
+
+```ts
+const itemRepository = await ItemRepository()
+const item = await itemRepository.fetch(decodedBody.id)
+item.deleted = false
+item.updatedAt = new Date()
+await itemRepository.save(item)
+```
+
+Update Kanban item order
+
+```ts
+const itemOrderRepository = await ItemOrderRepository()
+const itemOrder = await itemOrderRepository
+  .search()
+  .where('address')
+  .equals(decoded.address)
+  .and('category')
+  .equals(item.category)
+  .return.first()
+
+if (itemOrder) {
+  itemOrder.order = [item.entityId, ...itemOrder.order]
+  await itemOrderRepository.save(itemOrder)
+}
+```
+
+#### Deleted
+
+Retrieve Kanban items that are deleted by pagination of 5 items.
+
+```ts
+const itemRepository = await ItemRepository()
+const itemQuery = await itemRepository
+  .search()
+  .where('address')
+  .equals(decoded.address)
+  .and('deleted')
+  .equals(true)
+  .sortDescending('updatedAt')
+  .return.page(decodedBody.offset, 5)
 ```
 
 ## How to run it locally?
